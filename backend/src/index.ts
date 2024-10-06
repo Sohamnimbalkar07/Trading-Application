@@ -63,18 +63,11 @@ function fillOrder(
   const fills: Fill[] = [];
   const firstQuantity = quantity;
   if (side === "buy") {
-    console.log("inside if buy");
-    orderbook.asks.forEach ( (o) => {
-      console.log("inside foreach buy");
-      console.log("before if price", o.price);
+    orderbook.asks.forEach((o) => {
       if (o.price <= price && quantity !== 0) {
         const fill = Math.min(o.quantity, quantity);
-        console.log("fill", fill);
-        console.log("if order price", o.price);
         quantity = quantity - fill;
-        console.log("remaining quantity to be filled", quantity);
         o.quantity = o.quantity - fill;
-        console.log("sinle qua", o.quantity);
         bookWithQuantity.asks[o.price] =
           (bookWithQuantity.asks[o.price] || 0) - fill;
         fills.push({
@@ -87,9 +80,7 @@ function fillOrder(
       //   orderbook.asks.splice(orderbook.asks.indexOf(o), 1);
       // }
     });
-
     console.log("adding");
-
     if (quantity !== 0) {
       orderbook.bids.push({
         price,
@@ -115,7 +106,6 @@ function fillOrder(
       // if (o.quantity === 0) {
       //   orderbook.bids.splice(orderbook.bids.indexOf(o), 1);
       // }
-      
     });
     if (quantity !== 0) {
       orderbook.asks.push({
