@@ -3,7 +3,7 @@ import { Button } from "../ui/button";
 
 const Appbar = () => {
   return (
-    <div className="flex h-16 items-center text-white justify-between bg-black px-4">
+    <div className="flex h-16 items-center text-white justify-between bg-black px-4 border-b border-slate-800">
     <div className="flex items-center gap-12">
         <div className="text-xl cursor-pointer">Exchange</div>
         <div className="text-sm font-sans cursor-pointer">Markets</div>
