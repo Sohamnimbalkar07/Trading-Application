@@ -1,1 +1,60 @@
-{"orderbooks":[{"baseAsset":"TATA","bids":[{"price":1000,"quantity":2,"orderId":"zp25yhgx09qyrf552rr9k","filled":0,"side":"buy","userId":"1"},{"price":2000,"quantity":2,"orderId":"fhrqdy7ysro1nul75hv17j","filled":0,"side":"buy","userId":"2"},{"price":3000,"quantity":2,"orderId":"khvn63nqfjxnppw05octm","filled":0,"side":"buy","userId":"5"}],"asks":[{"price":5000,"quantity":2,"orderId":"hhwd9x9274gc2istow3yz","filled":1,"side":"sell","userId":"2"},{"price":6000,"quantity":2,"orderId":"g5xehpcjuqbhdsqvp37h7","filled":0,"side":"sell","userId":"5"}],"lastTradeId":3,"currentPrice":0}],"balances":[["1",{"INR":{"available":10000000,"locked":0},"TATA":{"available":10000000,"locked":0}}],["2",{"INR":{"available":10000000,"locked":0},"TATA":{"available":10000000,"locked":0}}],["5",{"INR":{"available":9933500,"locked":66500},"TATA":{"available":10000000,"locked":0}}]]}
+{
+  "orderbooks": [
+    {
+      "baseAsset": "TATA",
+      "bids": [
+        {
+          "price": 1000,
+          "quantity": 2,
+          "orderId": "zp25yhgx09qyrf552rr9k",
+          "filled": 0,
+          "side": "buy",
+          "userId": "1"
+        },
+        {
+          "price": 2000,
+          "quantity": 2,
+          "orderId": "fhrqdy7ysro1nul75hv17j",
+          "filled": 0,
+          "side": "buy",
+          "userId": "2"
+        }
+      ],
+      "asks": [
+        {
+          "price": 2000,
+          "quantity": 2,
+          "orderId": "g5xehpcjuqbhdsqvp37h7",
+          "filled": 0,
+          "side": "sell",
+          "userId": "2"
+        }
+      ],
+      "lastTradeId": 5,
+      "currentPrice": 0
+    }
+  ],
+  "balances": [
+    [
+      "1",
+      {
+        "INR": { "available": 10000000, "locked": 0 },
+        "TATA": { "available": 10000000, "locked": 0 }
+      }
+    ],
+    [
+      "2",
+      {
+        "INR": { "available": 10000000, "locked": 0 },
+        "TATA": { "available": 10000004, "locked": -4 }
+      }
+    ],
+    [
+      "5",
+      {
+        "INR": { "available": 10000, "locked": 0 },
+        "TATA": { "available": 8, "locked": 2 }
+      }
+    ]
+  ]
+}
