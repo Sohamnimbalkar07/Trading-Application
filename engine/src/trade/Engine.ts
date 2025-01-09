@@ -52,17 +52,17 @@ export class Engine {
       this.setBaseBalances();
     }
     setInterval(() => {
-        this.saveSnapshot();
+      this.saveSnapshot();
     }, 1000 * 3);
   }
 
   saveSnapshot() {
-        const snapshotSnapshot = {
-            orderbooks: this.orderbooks.map(o => o.getSnapshot()),
-            balances: Array.from(this.balances.entries())
-        }
-        fs.writeFileSync("./snapshot.json", JSON.stringify(snapshotSnapshot));
-    }
+    const snapshotSnapshot = {
+      orderbooks: this.orderbooks.map((o) => o.getSnapshot()),
+      balances: Array.from(this.balances.entries()),
+    };
+    fs.writeFileSync("./snapshot.json", JSON.stringify(snapshotSnapshot));
+  }
 
   process({
     message,
@@ -72,6 +72,7 @@ export class Engine {
     clientId: string;
   }) {
     switch (message.type) {
+      //price bug fix
       case CREATE_ORDER:
         const { executedQty, fills, orderId } = this.createOrder(
           message.data.market,
@@ -88,6 +89,67 @@ export class Engine {
             fills,
           },
         });
+        break;
+      case CANCEL_ORDER:
+        try {
+          const orderId = message.data.orderId;
+          const cancelMarket = message.data.market;
+          const cancelOrderbook = this.orderbooks.find(
+            (o) => o.ticker() === cancelMarket
+          );
+          const baseAsset = cancelMarket.split("_")[0];
+          if (!cancelOrderbook) {
+            throw new Error("No orderbook found");
+          }
+
+          const order =
+            cancelOrderbook.asks.find((o) => o.orderId === orderId) ||
+            cancelOrderbook.bids.find((o) => o.orderId === orderId);
+          if (!order) {
+            console.log("No order found");
+            throw new Error("No order found");
+          };
+
+          const userBalances = this.balances.get(order.userId);
+          if (!userBalances) {
+            throw new Error(`Balances for user ${order.userId} not found`);
+          }
+          if (order.side === "buy") {
+            const price = cancelOrderbook.cancelBid(order);
+            const leftQuantity = (order.quantity - order.filled) * order.price;
+            if (!userBalances[BASE_CURRENCY]) {
+              throw new Error(
+                `Base currency balance for user ${order.userId} not found`
+              );
+            };
+            userBalances[BASE_CURRENCY].available += leftQuantity;
+            userBalances[BASE_CURRENCY].locked -= leftQuantity;
+            if (price) {
+              // this.sendUpdatedDepthAt(price.toString(), cancelMarket);
+            }
+          } else {
+            const price = cancelOrderbook.cancelAsk(order);
+            const leftQuantity = order.quantity - order.filled;
+            userBalances[baseAsset].available +=
+              leftQuantity;
+            userBalances[baseAsset].locked -= leftQuantity;
+            if (price) {
+              // this.sendUpdatedDepthAt(price.toString(), cancelMarket);
+            }
+          }
+
+          RedisManager.getInstance().sendToApi(clientId, {
+            type: "ORDER_CANCELLED",
+            payload: {
+              orderId,
+              executedQty: 0,
+              remainingQty: 0,
+            },
+          });
+        } catch (e) {
+          console.log("Error while cancelling order");
+          console.log(e);
+        }
         break;
     }
   }
