@@ -15,6 +15,7 @@ export interface Fill {
   tradeId: number;
   otherUserId: string;
   markerOrderId: string;
+  isBuyerMaker: boolean;
 }
 
 export class Orderbook {
@@ -107,6 +108,7 @@ export class Orderbook {
           tradeId: this.lastTradeId++,
           otherUserId: this.asks[i].userId,
           markerOrderId: this.asks[i].orderId,
+          isBuyerMaker: false,
         });
       }
     }
@@ -140,6 +142,7 @@ export class Orderbook {
           tradeId: this.lastTradeId++,
           otherUserId: this.bids[i].userId,
           markerOrderId: this.bids[i].orderId,
+          isBuyerMaker: true,
         });
       }
     }
@@ -153,6 +156,49 @@ export class Orderbook {
       fills,
       executedQty,
     };
+  }
+
+  getDepth() {
+    const bids: [string, string][] = [];
+    const asks: [string, string][] = [];
+
+    const bidsObj: { [key: string]: number } = {};
+    const asksObj: { [key: string]: number } = {};
+
+    for (let i = 0; i < this.bids.length; i++) {
+      const order = this.bids[i];
+      if (!bidsObj[order.price]) {
+        bidsObj[order.price] = 0;
+      }
+      bidsObj[order.price] += order.quantity;
+    }
+
+    for (let i = 0; i < this.asks.length; i++) {
+      const order = this.asks[i];
+      if (!asksObj[order.price]) {
+        asksObj[order.price] = 0;
+      }
+      asksObj[order.price] += order.quantity;
+    }
+
+    for (const price in bidsObj) {
+      bids.push([price, bidsObj[price].toString()]);
+    }
+
+    for (const price in asksObj) {
+      asks.push([price, asksObj[price].toString()]);
+    }
+
+    return {
+      bids,
+      asks,
+    };
+  }
+
+  getOpenOrders(userId: string): Order[] {
+    const asks = this.asks.filter((x) => x.userId === userId);
+    const bids = this.bids.filter((x) => x.userId === userId);
+    return [...asks, ...bids];
   }
 
   cancelBid(order: Order) {

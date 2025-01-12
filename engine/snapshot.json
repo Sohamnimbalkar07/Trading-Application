@@ -52,7 +52,7 @@
     [
       "5",
       {
-        "INR": { "available": 10000, "locked": 0 },
+        "INR": { "available": 12000, "locked": 0 },
         "TATA": { "available": 8, "locked": 2 }
       }
     ]
