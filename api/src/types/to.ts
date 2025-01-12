@@ -20,7 +20,6 @@ export type MessageToEngine = {
     data: {
         amount: string,
         userId: string,
-        txnId: string
     }
 } | {
     type: typeof GET_DEPTH,
