@@ -31,13 +31,13 @@ export class Engine {
         snapshot = fs.readFileSync("./snapshot.json");
       }
     } catch (e) {
-      console.log("No snapshot found");
+      console.log("No snapshot found", e);
     }
 
     if (snapshot) {
       const snapshotSnapshot = JSON.parse(snapshot.toString());
       this.orderbooks = snapshotSnapshot.orderbooks.map(
-        (o: any) =>
+        (o: Orderbook) =>
           new Orderbook(
             o.baseAsset,
             o.bids,
@@ -98,6 +98,7 @@ export class Engine {
               remainingQty: 0,
             },
           });
+          console.log(e);
         }
         break;
       //bug
@@ -179,7 +180,7 @@ export class Engine {
           console.log(e);
         }
         break;
-      case ON_RAMP:
+      case ON_RAMP: {
         const userId = message.data.userId;
         const amount = Number(message.data.amount);
         const balance = this.onRamp(userId, amount);
@@ -191,7 +192,9 @@ export class Engine {
             amount: balance,
           },
         });
+
         break;
+      }
       case GET_DEPTH:
         try {
           const market = message.data.market;
