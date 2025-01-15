@@ -1,4 +1,5 @@
 import { RedisClientType, createClient } from "redis";
+import { UserManager } from "./UserManager";
 
 export class SubscriptionManager {
   private static instance: SubscriptionManager;
@@ -31,10 +32,19 @@ export class SubscriptionManager {
       subscription,
       (this.reverseSubscriptions.get(subscription) || []).concat(userId)
     );
-    // if (this.reverseSubscriptions.get(subscription)?.length === 1) {
-    //   this.redisClient.subscribe(subscription, this.redisCallbackHandler);
-    // }
+    if (this.reverseSubscriptions.get(subscription)?.length === 1) {
+      this.redisClient.subscribe(subscription, this.redisCallbackHandler);
+    }
   }
+
+  private redisCallbackHandler = (channel: string, message: string) => {
+    const parsedMessage = JSON.parse(message);
+    this.reverseSubscriptions
+      .get(channel)
+      ?.forEach((s) =>
+        UserManager.getInstance().getUser(s)?.emit(parsedMessage)
+      );
+  };
 
   public unsubscribe(userId: string, subscription: string) {
     const subscriptions = this.subscriptions.get(userId);
@@ -59,5 +69,9 @@ export class SubscriptionManager {
 
   public userLeft(userId: string) {
     this.subscriptions.get(userId)?.forEach((s) => this.unsubscribe(userId, s));
+  }
+
+  getSubscriptions(userId: string) {
+    return this.subscriptions.get(userId) || [];
   }
 }
