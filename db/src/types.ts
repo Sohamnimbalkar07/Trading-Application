@@ -10,7 +10,7 @@ export type DbMessage = {
         market: string
     }
 } | {
-    type: "ORDER_UPDATE",
+    type: "ORDER_CREATE",
     data: {
         orderId: string,
         executedQty: number,
@@ -18,5 +18,12 @@ export type DbMessage = {
         price?: string,
         quantity?: string,
         side?: "buy" | "sell",
+    }
+} | 
+{
+    type: "ORDER_UPDATE",
+    data: {
+        orderId: string,
+        executedQty: number,
     }
 }
