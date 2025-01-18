@@ -1,6 +1,6 @@
 import fs from "fs";
 import { RedisManager } from "../RedisManager";
-import { ORDER_UPDATE, TRADE_ADDED } from "../types/index";
+import { ORDER_UPDATE, TRADE_ADDED, ORDER_CREATE } from "../types/index";
 import {
   CANCEL_ORDER,
   CREATE_ORDER,
@@ -298,7 +298,7 @@ export class Engine {
     market: string
   ) {
     RedisManager.getInstance().pushMessage({
-      type: ORDER_UPDATE,
+      type: ORDER_CREATE,
       data: {
         orderId: order.orderId,
         executedQty: executedQty,
