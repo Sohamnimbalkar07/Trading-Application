@@ -5,48 +5,62 @@ export const GET_OPEN_ORDERS = "GET_OPEN_ORDERS";
 
 export const GET_DEPTH = "GET_DEPTH";
 
-export type MessageFromOrderbook = {
-    type: "DEPTH",
-    payload: {
-        market: string,
-        bids: [string, string][],
-        asks: [string, string][],
+export type MessageFromOrderbook =
+  | {
+      type: "DEPTH";
+      payload: {
+        market: string;
+        bids: [string, string][];
+        asks: [string, string][];
+      };
     }
-} | {
-    type: "ORDER_PLACED",
-    payload: {
-        orderId: string,
-        executedQty: number,
+  | {
+      type: "ORDER_PLACED";
+      payload: {
+        orderId: string;
+        executedQty: number;
         fills: [
-            {
-                price: string,
-                qty: number,
-                tradeId: number
-            }
-        ]
+          {
+            price: string;
+            qty: number;
+            tradeId: number;
+          }
+        ];
+      };
     }
-} | {
-    type: "ORDER_CANCELLED",
-    payload: {
-        orderId: string,
-        executedQty: number,
-        remainingQty: number
+  | {
+      type: "ORDER_CANCELLED";
+      payload: {
+        orderId: string;
+        executedQty: number;
+        remainingQty: number;
+      };
     }
-} | {
-    type: "OPEN_ORDERS",
-    payload: {
-        orderId: string,
-        executedQty: number,
-        price: string,
-        quantity: string,
-        side: "buy" | "sell",
-        userId: string
-    }[]
-} | {
-    type: "ON_RAMP",
-    payload: {
-        userId: string,
-        message: string,
-        amount: number
+  | {
+      type: "OPEN_ORDERS";
+      payload: {
+        orderId: string;
+        executedQty: number;
+        price: string;
+        quantity: string;
+        side: "buy" | "sell";
+        userId: string;
+      }[];
     }
-}
+  | {
+      type: "ON_RAMP";
+      payload: {
+        userId: string;
+        message: string;
+        amount: number;
+      };
+    };
+
+export type Kline = {
+  close: number;
+  bucket: Date;
+  high: number;
+  low: number;
+  open: number;
+  volume: number;
+};
