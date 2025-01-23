@@ -26,6 +26,7 @@ export async function processDbUpdates(response: string) {
 
 async function handleTradeAdded(data: DbMessage) {
   if (data.type === "TRADE_ADDED") {
+    console.log("inside trade added", data);
     const price = data.data.price;
     const volume = data.data.quantity;
     const timestamp = new Date(data.data.timestamp);
@@ -33,7 +34,8 @@ async function handleTradeAdded(data: DbMessage) {
     const values = [timestamp, price, volume];
     const client = await pool.connect();
     try {
-      await client.query(query, values);
+      const result = await client.query(query, values);
+      console.log(result);
     } finally {
       client.release();
     }

@@ -14,6 +14,6 @@ app.use("/api/v1/on-ramp", onRampRouter);
 app.use("/api/v1/depth", depthRouter);
 app.use("/api/v1/klines", klineRouter);
 
-app.listen(3000, () => {
+app.listen(3001, () => {
     console.log("Server is running on port 3000");
 });
