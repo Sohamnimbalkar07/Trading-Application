@@ -12,7 +12,7 @@ const Appbar = () => {
       <div className="flex gap-4">
         <Button
           variant="normal"
-          className="bg-green-200 hover:bg-green-500 text-green-950 cursor-pointer"
+          className="bg-green-300 hover:bg-green-500 text-green-950 cursor-pointer"
         >
           Deposit
         </Button>
