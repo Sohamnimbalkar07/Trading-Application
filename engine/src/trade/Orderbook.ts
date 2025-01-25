@@ -1,4 +1,5 @@
 import { BASE_CURRENCY } from "./Engine";
+import { binarySearch } from "./binarySearch";
 
 export interface Order {
   price: number;
@@ -67,7 +68,9 @@ export class Orderbook {
           fills,
         };
       }
-      this.bids.push(order);
+      // this.bids.push(order);
+      this.bids.splice(binarySearch(this.bids, order), 0, order);
+      // myArray.splice(binarySearch(myArray, element, comp), 0, element);
       return {
         executedQty,
         fills,
@@ -81,8 +84,8 @@ export class Orderbook {
           fills,
         };
       }
-      this.asks.push(order);
-
+      // this.asks.push(order);
+      this.asks.splice(binarySearch(this.asks, order), 0, order);
       return {
         executedQty,
         fills,

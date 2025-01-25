@@ -1,13 +1,14 @@
 "use client";
+import { IndianRupee } from "lucide-react";
 
 export const Marketbar = ({ market }: { market: string }) => {
   return (
-    <div className="h-16 px-4 bg-black flex items-center gap-10">
+    <div className="h-16 px-4 bg-black flex items-center gap-10 border-b border-slate-700">
       <Ticker market={market} />
       <div className="font-black text-white">TATA</div>
       <div className="flex flex-col text-white items-center">
       <div className="font-normal">0.2325</div>
-      <div className="font-semibold">$ 0.2325</div>
+      <div className="font-semibold">Rs. 0.2325</div>
       </div>
       <div className="flex flex-col  items-center">
       <div className="font-normal text-zinc-400">24H Change</div>
@@ -15,15 +16,15 @@ export const Marketbar = ({ market }: { market: string }) => {
       </div>
       <div className="flex flex-col items-center">
       <div className=" text-zinc-400 font-normal">24H High</div>
-      <div className="text-white font-semibold">$ 0.2325</div>
+      <div className="text-white font-semibold">Rs. 0.2325</div>
       </div>
       <div className="flex flex-col items-center">
       <div className="text-zinc-400 font-normal">24H Low</div>
-      <div className="text-white font-semibold">$ 0.2325</div>
+      <div className="text-white font-semibold">Rs. 0.2325</div>
       </div>
       <div className="flex flex-col items-center">
       <div className="text-zinc-400 font-normal">24H Volume</div>
-      <div className="text-white font-semibold">$ 0.2325</div>
+      <div className="text-white font-semibold">Rs. 0.2325</div>
       </div>
     </div>
   );

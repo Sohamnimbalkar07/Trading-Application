@@ -4,103 +4,152 @@
       "baseAsset": "TATA",
       "bids": [
         {
-          "price": 1007.6,
+          "price": 1001.2,
           "quantity": 1,
-          "orderId": "bxz6a440hg4z9lge5abl2r",
+          "orderId": "3qtq7em70hkmypuyqtdacr",
           "filled": 0,
           "side": "buy",
           "userId": "5"
         },
         {
-          "price": 1007.5,
+          "price": 1001.3,
           "quantity": 1,
-          "orderId": "536qh6zvtp68t9jqb57479",
+          "orderId": "yddd35hoku96grzowt5zcf",
           "filled": 0,
           "side": "buy",
           "userId": "5"
         },
         {
-          "price": 1007.8,
+          "price": 1001.5,
           "quantity": 1,
-          "orderId": "4cu8v066y2fi19ldjplncd",
+          "orderId": "cxm4hrvaiuk5kjkcy2yc6i",
           "filled": 0,
           "side": "buy",
           "userId": "5"
         },
         {
-          "price": 1007.7,
+          "price": 1001.5,
           "quantity": 1,
-          "orderId": "13snw2v5e9dfqbhnmcyxg4a",
+          "orderId": "w5kp9jq165ek4kw2bws7aj",
           "filled": 0,
           "side": "buy",
           "userId": "5"
         },
         {
-          "price": 1007.8,
+          "price": 1001.6,
           "quantity": 1,
-          "orderId": "2laz4f5clzkevz072nzklb",
+          "orderId": "r62xtsrng3jd0r95oh5sb8",
           "filled": 0,
           "side": "buy",
           "userId": "5"
         },
         {
-          "price": 1007.7,
+          "price": 1001.6,
           "quantity": 1,
-          "orderId": "xcj1rjnyw1hh56sykpdppn",
+          "orderId": "mw2gc5qwcxl3rim0hslgbg",
           "filled": 0,
           "side": "buy",
           "userId": "5"
         },
         {
-          "price": 1008,
+          "price": 1001.6,
           "quantity": 1,
-          "orderId": "lwvs56x0f9hqc2s3nbn5w",
+          "orderId": "qz0iihb5oxrut1kyzsa3dc",
           "filled": 0,
           "side": "buy",
           "userId": "5"
         },
         {
-          "price": 1007.5,
+          "price": 1001.7,
           "quantity": 1,
-          "orderId": "52zq3738vaiia7tk2xjb6c",
+          "orderId": "er1a9g9z9hk1pd7fy2mvmjh",
           "filled": 0,
           "side": "buy",
           "userId": "5"
         },
         {
-          "price": 1007.4,
+          "price": 1001.7,
           "quantity": 1,
-          "orderId": "1hg3gk9ay8hhm341y96h7r",
+          "orderId": "lf8zv3ji2aqh9l60enln",
           "filled": 0,
           "side": "buy",
           "userId": "5"
         },
         {
-          "price": 1008.1,
+          "price": 1001.9,
           "quantity": 1,
-          "orderId": "hdj4d6m1cuj1669ghy34ws",
+          "orderId": "mfhvflqcx2dzauuovr44",
           "filled": 0,
           "side": "buy",
           "userId": "5"
         },
         {
-          "price": 1007.9,
+          "price": 1002,
           "quantity": 1,
-          "orderId": "9nf5a0f7mdqz1dl15gknn",
+          "orderId": "zx6yevszti92xdsva77k4t",
           "filled": 0,
           "side": "buy",
           "userId": "5"
         },
         {
-          "price": 1007.5,
+          "price": 1002,
           "quantity": 1,
-          "orderId": "grre8ikwevcsiv3o7mblc",
+          "orderId": "kc1e0df2hs0owibljhmu7",
+          "filled": 0,
+          "side": "buy",
+          "userId": "5"
+        },
+        {
+          "price": 1004.2,
+          "quantity": 1,
+          "orderId": "esp7gsyzmp6tm5d36dqdy",
           "filled": 0,
           "side": "buy",
           "userId": "5"
         }
       ],
-      "asks": [],
+      "asks": [
+        {
+          "price": 1004.6,
+          "quantity": 1,
+          "orderId": "l3bsymmzv7mdg1xpf7yw",
+          "filled": 0,
+          "side": "sell",
+          "userId": "5"
+        },
+        {
+          "price": 1004.6,
+          "quantity": 1,
+          "orderId": "b5vo7fq9o2zon8xl0xsec",
+          "filled": 0,
+          "side": "sell",
+          "userId": "5"
+        },
+        {
+          "price": 1004.7,
+          "quantity": 1,
+          "orderId": "k0ny9qt6t23a6nxbke0g3",
+          "filled": 0,
+          "side": "sell",
+          "userId": "5"
+        },
+        {
+          "price": 1004.9,
+          "quantity": 1,
+          "orderId": "09zjlvahlbdnfbg623370wj",
+          "filled": 0,
+          "side": "sell",
+          "userId": "5"
+        },
+        {
+          "price": 1005.5,
+          "quantity": 1,
+          "orderId": "7uh9m97wfztwpiftaoqzno",
+          "filled": 0,
+          "side": "sell",
+          "userId": "5"
+        }
+      ],
       "lastTradeId": 1,
       "currentPrice": 0
     }
@@ -123,8 +172,8 @@
     [
       "5",
       {
-        "INR": { "available": 999999999987906.5, "locked": 12092.500000000002 },
-        "TATA": { "available": 999999999999999, "locked": 0 }
+        "INR": { "available": 999999999986975, "locked": 13023.800000000003 },
+        "TATA": { "available": 999999999999994, "locked": 5 }
       }
     ]
   ]
