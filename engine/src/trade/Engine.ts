@@ -222,6 +222,7 @@ export class Engine {
 
   //quantity bug
   sendUpdatedDepthAt(price: string, market: string) {
+    console.log("inside depth update", price, market);
     const orderbook = this.orderbooks.find((o) => o.ticker() === market);
     if (!orderbook) {
       return;
@@ -332,12 +333,15 @@ export class Engine {
       return;
     }
     const depth = orderbook.getDepth();
+    console.log("depth", depth);
     const fillPrices = fills.map((f) => f.price.toString());
+    console.log("fillPrices", fillPrices);
     if (side === "buy") {
       const updatedAsks = depth?.asks.filter((x) =>
         fillPrices.includes(x[0].toString())
       );
       const updatedBid = depth?.bids.find((x) => x[0] === price);
+      console.log("updatedAsks", updatedAsks, 'updatedBid', updatedBid );
       console.log("publish ws depth updates");
       RedisManager.getInstance().publishMessage(`depth@${market}`, {
         stream: `depth@${market}`,

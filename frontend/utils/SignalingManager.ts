@@ -39,24 +39,23 @@ export class SignalingManager {
     };
     this.ws.onmessage = (event) => {
       const message = JSON.parse(event.data);
-      const type = message.data.e;
+      const type = message.e;
       if (this.callbacks[type]) {
         this.callbacks[type].forEach(({ callback }) => {
           if (type === "ticker") {
             const newTicker: Partial<Ticker> = {
-              lastPrice: message.data.c,
-              high: message.data.h,
-              low: message.data.l,
-              volume: message.data.v,
-              quoteVolume: message.data.V,
-              symbol: message.data.s,
+              lastPrice: message.c,
+              high: message.h,
+              low: message.l,
+              volume: message.v,
+              quoteVolume: message.V,
+              symbol: message.s,
             };
-            console.log(newTicker);
             callback(newTicker);
           }
           if (type === "depth") {
-            const updatedBids = message.data.b;
-            const updatedAsks = message.data.a;
+            const updatedBids = message.b;
+            const updatedAsks = message.a;
             callback({ bids: updatedBids, asks: updatedAsks });
           }
         });

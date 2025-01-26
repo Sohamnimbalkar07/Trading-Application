@@ -1,4 +1,4 @@
-import { Order } from "./Orderbook";
+import { Order } from "./trade/Orderbook";
 
 export function binarySearch(orders: Order[], order: Order): number {
   if (orders.length === 0) return 0;

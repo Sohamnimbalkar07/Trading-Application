@@ -4,9 +4,14 @@ import { useParams } from "next/navigation";
 import { Marketbar } from "@/components/layout/Marketbar";
 import { SwapUI } from "@/components/layout/SwapUI";
 import { Depth } from "@/components/layout/Depth";
+import { SetRecoilState, useSetRecoilState } from "recoil";
+import { marketState } from "@/store/depth/depthState";
 
 export default function Page() {
   const { market } = useParams();
+  const setMarket = useSetRecoilState(marketState);
+  setMarket(market as string);
+  
   return (
     <div>
       <div className="grid grid-cols-12 h-full">

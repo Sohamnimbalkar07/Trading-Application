@@ -1,5 +1,5 @@
 import { BASE_CURRENCY } from "./Engine";
-import { binarySearch } from "./binarySearch";
+import { binarySearch } from "../binarySearch";
 
 export interface Order {
   price: number;
