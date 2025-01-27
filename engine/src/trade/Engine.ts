@@ -222,7 +222,6 @@ export class Engine {
 
   //quantity bug
   sendUpdatedDepthAt(price: string, market: string) {
-    console.log("inside depth update", price, market);
     const orderbook = this.orderbooks.find((o) => o.ticker() === market);
     if (!orderbook) {
       return;
@@ -333,16 +332,18 @@ export class Engine {
       return;
     }
     const depth = orderbook.getDepth();
-    console.log("depth", depth);
     const fillPrices = fills.map((f) => f.price.toString());
-    console.log("fillPrices", fillPrices);
     if (side === "buy") {
       const updatedAsks = depth?.asks.filter((x) =>
         fillPrices.includes(x[0].toString())
       );
-      const updatedBid = depth?.bids.find((x) => x[0] === price);
-      console.log("updatedAsks", updatedAsks, 'updatedBid', updatedBid );
-      console.log("publish ws depth updates");
+      fillPrices.forEach((fillPrice) => {
+        const exists = updatedAsks.some(([price]) => price == fillPrice);
+        if (!exists) {
+          updatedAsks.push([fillPrice, "0"]);
+        }
+      });
+      const updatedBid = depth?.bids.find((x) => x[0] == price);
       RedisManager.getInstance().publishMessage(`depth@${market}`, {
         stream: `depth@${market}`,
         data: {
@@ -356,7 +357,13 @@ export class Engine {
       const updatedBids = depth?.bids.filter((x) =>
         fillPrices.includes(x[0].toString())
       );
-      const updatedAsk = depth?.asks.find((x) => x[0] === price);
+      fillPrices.forEach((fillPrice) => {
+        const exists = updatedBids.some(([price]) => price == fillPrice);
+        if (!exists) {
+          updatedBids.push([fillPrice, "0"]);
+        }
+      });
+      const updatedAsk = depth?.asks.find((x) => x[0] == price);
       console.log("publish ws depth updates");
       RedisManager.getInstance().publishMessage(`depth@${market}`, {
         stream: `depth@${market}`,
