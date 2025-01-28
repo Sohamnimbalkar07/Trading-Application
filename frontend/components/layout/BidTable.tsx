@@ -40,7 +40,7 @@ function Bid({ price, quantity, total, maxTotal }: { price: string, quantity: st
                     {price}
                 </div>
                 <div>
-                    {quantity}
+                    {Number(quantity).toFixed(2)}
                 </div>
                 <div>
                     {total.toFixed(2)}

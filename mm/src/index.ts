@@ -1,84 +1,132 @@
 import axios from "axios";
 
 const BASE_URL = process.env.BACKEND_URL;
-const TOTAL_BIDS = 15;
-const TOTAL_ASK = 15;
 const MARKET = "TATA_INR";
 const USER_ID = "5";
+const TOTAL_BIDS = 15;
+const TOTAL_ASKS = 15;
+const TRADE_MIN = 5;
+const TRADE_MAX = 7;
+const BASE_PRICE = 1000;
+const PRICE_SPREAD = 5;
+const SMALL_BATCH_SIZE = 3;
+const INTERVAL = 2000;
 
 async function main() {
-    const price = 1000 + Math.random() * 10;
-    const openOrders = await axios.get(`${BASE_URL}/api/v1/order/open?userId=${USER_ID}&market=${MARKET}`);
+  let tradesScheduled = 0;
 
-    const totalBids = openOrders.data.filter((o: any) => o.side === "buy").length;
-    const totalAsks = openOrders.data.filter((o: any) => o.side === "sell").length;
+  while (true) {
+    try {
+      const currentPrice = BASE_PRICE + Math.random() * 10;
+      const openOrders = await getOpenOrders();
 
-    const cancelledBids = await cancelBidsMoreThan(openOrders.data, price);
-    const cancelledAsks = await cancelAsksLessThan(openOrders.data, price);
+      await maintainLiquidity(openOrders, currentPrice);
 
+      if (tradesScheduled <= 0) {
+        tradesScheduled = TRADE_MIN + Math.floor(Math.random() * (TRADE_MAX - TRADE_MIN + 1));
+      }
 
-    let bidsToAdd = TOTAL_BIDS - totalBids - cancelledBids;
-    let asksToAdd = TOTAL_ASK - totalAsks - cancelledAsks;
+      await performScheduledTrades(currentPrice, Math.min(tradesScheduled, SMALL_BATCH_SIZE));
+      tradesScheduled -= SMALL_BATCH_SIZE;
 
-    while(bidsToAdd > 0 || asksToAdd > 0) {
-        if (bidsToAdd > 0) {
-            await axios.post(`${BASE_URL}/api/v1/order`, {
-                market: MARKET,
-                price: (price - Math.random() * 1).toFixed(1).toString(),
-                quantity: "1",
-                side: "buy",
-                userId: USER_ID
-            });
-            bidsToAdd--;
-        }
-        if (asksToAdd > 0) {
-            await axios.post(`${BASE_URL}/api/v1/order`, {
-                market: MARKET,
-                price: (price + Math.random() * 1).toFixed(1).toString(),
-                quantity: "1",
-                side: "sell",
-                userId: USER_ID
-            });
-            asksToAdd--;
-        }
+      await sleep(INTERVAL);
+    } catch (error) {
+      console.error("Error in market maintenance:", error);
     }
-
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    main();
+  }
 }
 
-async function cancelBidsMoreThan(openOrders: any[], price: number) {
-    let promises: any[] = [];
-    openOrders.map(o => {
-        if (o.side === "buy" && (o.price > price || Math.random() < 0.1)) {
-            promises.push(axios.delete(`${BASE_URL}/api/v1/order`, {
-                data: {
-                    orderId: o.orderId,
-                    market: MARKET
-                }
-            }));
-        }
-    });
-    await Promise.all(promises);
-    return promises.length;
+async function getOpenOrders() {
+  const response = await axios.get(
+    `${BASE_URL}/api/v1/order/open?userId=${USER_ID}&market=${MARKET}`
+  );
+  return response.data;
 }
 
-async function cancelAsksLessThan(openOrders: any[], price: number) {
-    let promises: any[] = [];
-    openOrders.map(o => {
-        if (o.side === "sell" && (o.price < price || Math.random() < 0.5)) {
-            promises.push(axios.delete(`${BASE_URL}/api/v1/order`, {
-                data: {
-                    orderId: o.orderId,
-                    market: MARKET
-                }
-            }));
-        }
-    });
+async function maintainLiquidity(openOrders: any[], currentPrice: number) {
+  const totalBids = openOrders.filter((o: any) => o.side === "buy").length;
+  const totalAsks = openOrders.filter((o: any) => o.side === "sell").length;
 
-    await Promise.all(promises);
-    return promises.length;
+  await cancelOutdatedOrders(openOrders, currentPrice, SMALL_BATCH_SIZE);
+
+  if (totalBids < TOTAL_BIDS) {
+    const bidsToAdd = Math.min(SMALL_BATCH_SIZE, TOTAL_BIDS - totalBids);
+    await addOrders("buy", bidsToAdd, currentPrice - PRICE_SPREAD, currentPrice);
+  }
+  if (totalAsks < TOTAL_ASKS) {
+    const asksToAdd = Math.min(SMALL_BATCH_SIZE, TOTAL_ASKS - totalAsks);
+    await addOrders("sell", asksToAdd, currentPrice, currentPrice + PRICE_SPREAD);
+  }
+}
+
+async function addOrders(side: "buy" | "sell", count: number, minPrice: number, maxPrice: number) {
+  const promises = [];
+  for (let i = 0; i < count; i++) {
+    const price = (minPrice + Math.random() * (maxPrice - minPrice)).toFixed(2);
+    const quantity = (1 + Math.random() * 2).toFixed(2);
+    promises.push(
+      axios.post(`${BASE_URL}/api/v1/order`, {
+        market: MARKET,
+        price,
+        quantity,
+        side,
+        userId: USER_ID,
+      })
+    );
+  }
+  await Promise.all(promises);
+}
+
+async function cancelOutdatedOrders(openOrders: any[], currentPrice: number, batchSize: number) {
+  const promises = [];
+  let canceled = 0;
+  for (const order of openOrders) {
+    if (canceled >= batchSize) break;
+    if (
+      (order.side === "buy" && order.price < currentPrice - PRICE_SPREAD) ||
+      (order.side === "sell" && order.price > currentPrice + PRICE_SPREAD)
+    ) {
+      promises.push(
+        axios.delete(`${BASE_URL}/api/v1/order`, {
+          data: { orderId: order.orderId, market: MARKET },
+        })
+      );
+      canceled++;
+    }
+  }
+  await Promise.all(promises);
+}
+
+async function performScheduledTrades(currentPrice: number, tradeCount: number) {
+  const promises = [];
+  for (let i = 0; i < tradeCount; i++) {
+    const side = Math.random() > 0.5 ? "buy" : "sell";
+    const price =
+      side === "buy"
+        ? (currentPrice - Math.random() * 1).toFixed(2)
+        : (currentPrice + Math.random() * 1).toFixed(2);
+    const quantity = (0.5 + Math.random()).toFixed(2);
+
+    promises.push(
+      axios.post(`${BASE_URL}/api/v1/order`, {
+        market: MARKET,
+        price,
+        quantity,
+        side,
+        userId: USER_ID,
+      })
+    );
+  }
+  await Promise.all(promises);
+}
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 main();
+
+
+
+
+
