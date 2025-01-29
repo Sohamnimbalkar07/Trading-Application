@@ -1,4 +1,5 @@
 import { bidsState } from "@/store/depth/depthState";
+import { ColorType } from "lightweight-charts";
 import { useRecoilValue } from "recoil";
 
 export const BidTable = () => {
@@ -20,7 +21,7 @@ function Bid({ price, quantity, total, maxTotal }: { price: string, quantity: st
                 display: "flex",
                 position: "relative",
                 width: "100%",
-                backgroundColor: "transparent",
+                backgroundColor: "black",
                 overflow: "hidden",
             }}
         >
@@ -28,14 +29,14 @@ function Bid({ price, quantity, total, maxTotal }: { price: string, quantity: st
             style={{
             position: "absolute",
             top: 0,
-            left: 0,
+            right: 0,
             width: `${(100 * total) / maxTotal}%`,
             height: "100%",
-            background: "rgba(1, 167, 129, 0.325)",
+            background: "rgba(1, 250, 129, 0.325)",
             transition: "width 0.3s ease-in-out",
             }}
         ></div>
-            <div className={`flex justify-between text-xs w-full`}>
+            <div className={`flex justify-between text-xs w-full text-white px-3`}>
                 <div>
                     {price}
                 </div>

@@ -111,7 +111,7 @@ export const Depth = () => {
   }, []);
 
   return (
-    <div>
+    <div className="border-l-2 bg-slate-950 border-slate-700" >
       <div className="flex gap-7 h-6 p-1 px-2 bg-black">
         <div className="text-slate-100 font-normal cursor-pointer">Depth</div>
         <div className="text-slate-100 font-normal cursor-pointer">Trade</div>
@@ -125,7 +125,7 @@ export const Depth = () => {
 
 function TableHeader() {
   return (
-    <div className="flex justify-between items-center p-2 text-slate-100 bg-black">
+    <div className="flex justify-between items-center px-3 py-2 text-slate-100 bg-black">
       <div className="text-slate-300">Price</div>
       <div className="text-slate-300">Size</div>
       <div className="text-slate-300">Total</div>

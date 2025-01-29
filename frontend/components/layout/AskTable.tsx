@@ -2,7 +2,6 @@ import { asksState } from "@/store/depth/depthState";
 import { useRecoilValue } from "recoil";
 
 export const AskTable = () => {
-    
   const asks = useRecoilValue(asksState);
   let currentTotal = 0;
   const relevantAsks = asks.slice(0, 15);
@@ -47,7 +46,7 @@ function Ask({
         display: "flex",
         position: "relative",
         width: "100%",
-        backgroundColor: "transparent",
+        backgroundColor: "black",
         overflow: "hidden",
       }}
     >
@@ -55,14 +54,14 @@ function Ask({
         style={{
           position: "absolute",
           top: 0,
-          left: 0,
+          right: 0,
           width: `${(100 * total) / maxTotal}%`,
           height: "100%",
           background: "rgba(228, 75, 68, 0.325)",
           transition: "width 0.3s ease-in-out",
         }}
       ></div>
-      <div className="flex justify-between text-xs w-full">
+      <div className="flex justify-between text-xs w-full text-white px-3">
         <div>{price}</div>
         <div>{Number(quantity).toFixed(2)}</div>
         <div>{total?.toFixed(2)}</div>

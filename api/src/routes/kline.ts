@@ -26,6 +26,7 @@ klineRouter.get("/", async (req : Request, res: any) => {
     const startDate = new Date(Number(startTime) * 1000);
     const endDate = new Date(Number(endTime) * 1000);
     const result = await pgClient.query(klineQuery, [startDate, endDate]);
+    console.log("result", result);
     const response = result.rows.map((x: any) => ({
       close: x.close,
       end: x.bucket,
