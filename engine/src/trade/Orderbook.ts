@@ -1,4 +1,5 @@
 import { BASE_CURRENCY } from "./Engine";
+import { binarySearch } from "../binarySearch";
 
 export interface Order {
   price: number;
@@ -67,7 +68,9 @@ export class Orderbook {
           fills,
         };
       }
-      this.bids.push(order);
+      // this.bids.push(order);
+      this.bids.splice(binarySearch(this.bids, order), 0, order);
+      // myArray.splice(binarySearch(myArray, element, comp), 0, element);
       return {
         executedQty,
         fills,
@@ -81,8 +84,8 @@ export class Orderbook {
           fills,
         };
       }
-      this.asks.push(order);
-
+      // this.asks.push(order);
+      this.asks.splice(binarySearch(this.asks, order), 0, order);
       return {
         executedQty,
         fills,
@@ -132,7 +135,7 @@ export class Orderbook {
       if (this.bids[i].price >= order.price && executedQty < order.quantity) {
         const amountRemaining = Math.min(
           order.quantity - executedQty,
-          this.bids[i].quantity
+          this.bids[i].quantity -this.bids[i].filled
         );
         executedQty += amountRemaining;
         this.bids[i].filled += amountRemaining;
@@ -170,7 +173,7 @@ export class Orderbook {
       if (!bidsObj[order.price]) {
         bidsObj[order.price] = 0;
       }
-      bidsObj[order.price] += order.quantity;
+      bidsObj[order.price] += order.quantity - order.filled;
     }
 
     for (let i = 0; i < this.asks.length; i++) {
@@ -178,7 +181,7 @@ export class Orderbook {
       if (!asksObj[order.price]) {
         asksObj[order.price] = 0;
       }
-      asksObj[order.price] += order.quantity;
+      asksObj[order.price] += order.quantity - order.filled;
     }
 
     for (const price in bidsObj) {
