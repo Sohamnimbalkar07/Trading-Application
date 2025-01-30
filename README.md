@@ -17,7 +17,7 @@ The system architecture consists of several services that work together to handl
 - **Description**: The API server that handles incoming HTTP requests from users to place orders, fetch order details, and interact with the platform.
   
 ### 2. Engine
-- **Description**: The core engine running multiple market order books. It stores user balances in memory and processes orders.
+- **Description**: The core engine running multiple market order books. runs various market orderbooks, stores user balances in memory.
 
 ### 3. WebSocket
 - **Description**: A WebSocket server that allows users to subscribe to real-time events such as order updates, trade executions, and market events.
@@ -39,3 +39,5 @@ The system architecture consists of several services that work together to handl
 
 ### 9. Market Maker (MM)
 - **Description**: A service that places random orders in the order books to keep liquidity flowing, ensuring that the market remains active.
+
+![Platform Diagram](./frontend/public/backendArchitecture.png)
