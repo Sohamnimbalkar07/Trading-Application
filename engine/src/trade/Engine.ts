@@ -287,7 +287,6 @@ export class Engine {
     this.updateDbOrders(order, executedQty, fills, market);
     this.publisWsDepthUpdates(fills, price, side, market);
     this.publishWsTrades(fills, market);
-
     return { executedQty, fills, orderId: order.orderId };
   }
 
@@ -364,7 +363,6 @@ export class Engine {
         }
       });
       const updatedAsk = depth?.asks.find((x) => x[0] == price);
-      console.log("publish ws depth updates");
       RedisManager.getInstance().publishMessage(`depth@${market}`, {
         stream: `depth@${market}`,
         data: {
