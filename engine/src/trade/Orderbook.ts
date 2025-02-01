@@ -1,5 +1,6 @@
 import { BASE_CURRENCY } from "./Engine";
 import { binarySearch } from "../binarySearch";
+import { RedisManager } from "../RedisManager";
 
 export interface Order {
   price: number;
@@ -70,7 +71,6 @@ export class Orderbook {
       }
       // this.bids.push(order);
       this.bids.splice(binarySearch(this.bids, order), 0, order);
-      // myArray.splice(binarySearch(myArray, element, comp), 0, element);
       return {
         executedQty,
         fills,
@@ -93,7 +93,7 @@ export class Orderbook {
     }
   }
 
-  matchBid(order: Order): { fills: Fill[]; executedQty: number } {
+  matchBid( order: Order ) : { fills: Fill[]; executedQty: number } {
     const fills: Fill[] = [];
     let executedQty = 0;
 
@@ -221,4 +221,32 @@ export class Orderbook {
       return price;
     }
   }
+
+  updateKline(symbol : string, interval : string, timestamp : number, price : string, volume: string) {
+    const bucketTimestamp = timestamp - (timestamp % 3600); // Round to nearest hour
+    const key = `kline:${symbol}:${interval}:${bucketTimestamp}`;
+     const redis = RedisManager.getInstance();
+     const client = redis.client;
+    const exists = await redis.exists(key);
+
+    if (!exists) {
+        // First trade, initialize Kline
+        await redis.hset(key, {
+            open: price,
+            high: price,
+            low: price,
+            close: price,
+            volume: volume,
+        });
+    } else {
+        // Update existing Kline
+        await redis.hset(key, "close", price);
+        await redis.hset(key, "volume", parseFloat(await redis.hget(key, "volume")) + volume);
+        await redis.hset(key, "high", Math.max(price, parseFloat(await redis.hget(key, "high"))));
+        await redis.hset(key, "low", Math.min(price, parseFloat(await redis.hget(key, "low"))));
+    }
+
+    // Publish the updated Kline
+    await publishKline(symbol, interval, bucketTimestamp);
+}
 }
