@@ -93,7 +93,7 @@ export class Orderbook {
     }
   }
 
-  matchBid( order: Order ) : { fills: Fill[]; executedQty: number } {
+  matchBid(order: Order): { fills: Fill[]; executedQty: number } {
     const fills: Fill[] = [];
     let executedQty = 0;
 
@@ -113,6 +113,14 @@ export class Orderbook {
           markerOrderId: this.asks[i].orderId,
           isBuyerMaker: false,
         });
+
+        this.updateKline(
+          this.baseAsset,
+          "1h",
+          Math.floor(Date.now() / 1000),
+          this.asks[i].price.toString(),
+          filledQty.toString()
+        );
       }
     }
     for (let i = 0; i < this.asks.length; i++) {
@@ -135,7 +143,7 @@ export class Orderbook {
       if (this.bids[i].price >= order.price && executedQty < order.quantity) {
         const amountRemaining = Math.min(
           order.quantity - executedQty,
-          this.bids[i].quantity -this.bids[i].filled
+          this.bids[i].quantity - this.bids[i].filled
         );
         executedQty += amountRemaining;
         this.bids[i].filled += amountRemaining;
@@ -147,6 +155,14 @@ export class Orderbook {
           markerOrderId: this.bids[i].orderId,
           isBuyerMaker: true,
         });
+
+        this.updateKline(
+          this.baseAsset,
+          "1h",
+          Math.floor(Date.now() / 1000),
+          this.bids[i].price.toString(),
+          amountRemaining.toString()
+        );
       }
     }
     for (let i = 0; i < this.bids.length; i++) {
@@ -222,31 +238,76 @@ export class Orderbook {
     }
   }
 
-  updateKline(symbol : string, interval : string, timestamp : number, price : string, volume: string) {
-    const bucketTimestamp = timestamp - (timestamp % 3600); // Round to nearest hour
-    const key = `kline:${symbol}:${interval}:${bucketTimestamp}`;
-     const redis = RedisManager.getInstance();
-     const client = redis.client;
-    const exists = await redis.exists(key);
+  async updateKline(
+    symbol: string,
+    interval: string,
+    timestamp: number,
+    price: string,
+    volume: string
+  ) {
+    const bucket = timestamp - (timestamp % 3600);
+
+    const key = `kline:${symbol}:${interval}:${bucket}`;
+
+    const exists = await RedisManager.getInstance().keyExists(key);
 
     if (!exists) {
-        // First trade, initialize Kline
-        await redis.hset(key, {
-            open: price,
-            high: price,
-            low: price,
-            close: price,
-            volume: volume,
-        });
+      await RedisManager.getInstance().addKlineData(key, {
+        open: price,
+        high: price,
+        low: price,
+        close: price,
+        volume: volume,
+      });
     } else {
-        // Update existing Kline
-        await redis.hset(key, "close", price);
-        await redis.hset(key, "volume", parseFloat(await redis.hget(key, "volume")) + volume);
-        await redis.hset(key, "high", Math.max(price, parseFloat(await redis.hget(key, "high"))));
-        await redis.hset(key, "low", Math.min(price, parseFloat(await redis.hget(key, "low"))));
+      await RedisManager.getInstance().updateKlineField(key, "close", price);
+      await RedisManager.getInstance().updateKlineField(
+        key,
+        "volume",
+        parseFloat(
+          (await RedisManager.getInstance().getKlineField(
+            key,
+            "volume"
+          )) as string
+        ) + volume
+      );
+
+      await RedisManager.getInstance().updateKlineField(
+        key,
+        "high",
+        Math.max(
+          parseFloat(price),
+          parseFloat(
+            (await RedisManager.getInstance().getKlineField(
+              key,
+              "high"
+            )) as string
+          )
+        ).toString()
+      );
+
+      await RedisManager.getInstance().updateKlineField(
+        key,
+        "low",
+        Math.min(
+          parseFloat(price),
+          parseFloat(
+            (await RedisManager.getInstance().getKlineField(
+              key,
+              "low"
+            )) as string
+          )
+        ).toString()
+      );
     }
 
-    // Publish the updated Kline
-    await publishKline(symbol, interval, bucketTimestamp);
-}
+    const updatedKline = await RedisManager.getInstance().getAllKlineData(key);
+    RedisManager.getInstance().publishMessage(`kline:${symbol}:${interval}`, {
+      stream: `kline:${symbol}:${interval}`,
+      data: {
+        ...updatedKline,
+        e: "kline",
+      },
+    });
+  }
 }
