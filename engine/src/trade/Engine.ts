@@ -27,7 +27,8 @@ export class Engine {
   constructor() {
     let snapshot = null;
     try {
-      if (process.env.WITH_SNAPSHOT) {
+      if (true) {
+        // process.env.WITH_SNAPSHOT
         snapshot = fs.readFileSync("./snapshot.json");
       }
     } catch (e) {

@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "scripts": {
     "start": "tsc && node --env-file=.env dist/index.js",
-    "dev": "tsc && nodemon --env-file=.env src/index.ts",
+    "dev": "tsc && nodemon src/index.ts",
     "lint": "eslint .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

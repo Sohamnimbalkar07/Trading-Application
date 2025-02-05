@@ -41,9 +41,9 @@ async function handleTradeAdded(data: DbMessage) {
 }
 
 async function handleOrderUpdate(data: DbMessage) {
-  console.log("Order Update", data);
+  // console.log("Order Update", data);
 }
 
 async function handleOrderCreate(data: DbMessage) {
-  console.log("Order Create", data);
+  // console.log("Order Create", data);
 }

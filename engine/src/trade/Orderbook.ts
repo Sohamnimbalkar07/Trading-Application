@@ -157,7 +157,7 @@ export class Orderbook {
         });
 
         this.updateKline(
-          this.baseAsset,
+          this.ticker(),
           "1h",
           Math.floor(Date.now() / 1000),
           this.bids[i].price.toString(),
@@ -246,13 +246,11 @@ export class Orderbook {
     volume: string
   ) {
     const bucket = timestamp - (timestamp % 3600);
-
-    const key = `kline:${symbol}:${interval}:${bucket}`;
-
+    const key = `kline:${symbol}:${interval}`;
     const exists = await RedisManager.getInstance().keyExists(key);
-
     if (!exists) {
       await RedisManager.getInstance().addKlineData(key, {
+        timestamp: bucket.toString(),
         open: price,
         high: price,
         low: price,
@@ -260,50 +258,36 @@ export class Orderbook {
         volume: volume,
       });
     } else {
-      await RedisManager.getInstance().updateKlineField(key, "close", price);
+      const klineData = await RedisManager.getInstance().getAllKlineData(key);
+      if (klineData.close !== price) {
+        await RedisManager.getInstance().updateKlineField(key, "close", price);
+      }
+      if (klineData.timestamp !== bucket.toString()) {
+        await RedisManager.getInstance().updateKlineField(
+          key,
+          "timestamp",
+          bucket.toString()
+        );
+      }
+
       await RedisManager.getInstance().updateKlineField(
         key,
         "volume",
-        parseFloat(
-          (await RedisManager.getInstance().getKlineField(
-            key,
-            "volume"
-          )) as string
-        ) + volume
+        (parseFloat(klineData.volume) + parseFloat(volume)).toString()
       );
 
-      await RedisManager.getInstance().updateKlineField(
-        key,
-        "high",
-        Math.max(
-          parseFloat(price),
-          parseFloat(
-            (await RedisManager.getInstance().getKlineField(
-              key,
-              "high"
-            )) as string
-          )
-        ).toString()
-      );
+      if (parseFloat(klineData.high) < parseFloat(price)) {
+        await RedisManager.getInstance().updateKlineField(key, "high", price);
+      }
 
-      await RedisManager.getInstance().updateKlineField(
-        key,
-        "low",
-        Math.min(
-          parseFloat(price),
-          parseFloat(
-            (await RedisManager.getInstance().getKlineField(
-              key,
-              "low"
-            )) as string
-          )
-        ).toString()
-      );
+      if (parseFloat(klineData.low) > parseFloat(price)) {
+        await RedisManager.getInstance().updateKlineField(key, "low", price);
+      }
     }
 
     const updatedKline = await RedisManager.getInstance().getAllKlineData(key);
-    RedisManager.getInstance().publishMessage(`kline:${symbol}:${interval}`, {
-      stream: `kline:${symbol}:${interval}`,
+    RedisManager.getInstance().publishMessage(`kline@${symbol}:${interval}`, {
+      stream: `kline@${symbol}:${interval}`,
       data: {
         ...updatedKline,
         e: "kline",
