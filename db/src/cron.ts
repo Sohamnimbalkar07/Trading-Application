@@ -7,7 +7,7 @@ async function refreshViews() {
     await client.query("REFRESH MATERIALIZED VIEW klines_1h");
     await client.query("REFRESH MATERIALIZED VIEW klines_1w");
 
-    console.log("Materialized views refreshed successfully");
+    // console.log("Materialized views refreshed successfully");
   } finally {
     client.release();
   }
