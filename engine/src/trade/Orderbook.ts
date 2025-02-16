@@ -117,7 +117,7 @@ export class Orderbook {
         this.updateKline(
           this.baseAsset,
           "1h",
-          Math.floor(Date.now() / 1000),
+          new Date().toISOString(),  //Math.floor(Date.now() / 1000)
           this.asks[i].price.toString(),
           filledQty.toString()
         );
@@ -159,7 +159,7 @@ export class Orderbook {
         this.updateKline(
           this.ticker(),
           "1h",
-          Math.floor(Date.now() / 1000),
+          new Date().toISOString(),
           this.bids[i].price.toString(),
           amountRemaining.toString()
         );
@@ -241,11 +241,14 @@ export class Orderbook {
   async updateKline(
     symbol: string,
     interval: string,
-    timestamp: number,
+    timestamp: string,
     price: string,
     volume: string
   ) {
-    const bucket = timestamp - (timestamp % 3600);
+    // const bucket = timestamp - (timestamp % 3600);
+    const bucket = new Date(
+      Math.floor(new Date(timestamp).getTime() / 3600000) * 3600000
+    ).toISOString();
     const key = `kline:${symbol}:${interval}`;
     const exists = await RedisManager.getInstance().keyExists(key);
     if (!exists) {

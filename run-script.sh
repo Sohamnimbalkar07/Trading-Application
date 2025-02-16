@@ -19,4 +19,8 @@ npm run refresh:views &
 
 cd ..
 cd "mm"
-npm run start
+npm run start &
+
+cd ..
+cd "frontend"
+npm run dev
