@@ -1,12 +1,13 @@
 "use client";
 import { useEffect } from "react";
-import { useSetRecoilState, useRecoilValue } from "recoil";
+import { useSetRecoilState, useRecoilValue, useRecoilState } from "recoil";
 import {
   bidsState,
   asksState,
   priceState,
   depthState,
   marketState,
+  midPriceState
 } from "@/store/depth/depthState";
 import { SignalingManager } from "@/utils/SignalingManager";
 import { AskTable } from "./AskTable";
@@ -18,6 +19,7 @@ export const Depth = () => {
   const setAsks = useSetRecoilState(asksState);
   const setPrice = useSetRecoilState(priceState);
   const depthData = useRecoilValue(depthState);
+  const [midPrice, setMidPrice] = useRecoilState(midPriceState);
 
   useEffect(() => {
     SignalingManager.getInstance().registerCallback(
@@ -86,6 +88,7 @@ export const Depth = () => {
           );
           return asksAfterUpdate;
         });
+       
       },
       `DEPTH-${market}`
     );
@@ -117,8 +120,8 @@ export const Depth = () => {
         <div className="text-slate-100 font-normal cursor-pointer">Trade</div>
       </div>
       <TableHeader />
-      <BidTable/>
       <AskTable/>
+      <BidTable/>
     </div>
   );
 };

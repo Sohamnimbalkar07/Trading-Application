@@ -9,6 +9,11 @@ export const marketState = atom<string>({
   default: "TATA_INR",
 });
 
+export const midPriceState = atom<number>({
+  key: "midPriceState",
+  default: 0,
+});
+
 export const bidsState = atom<[string, string][]>({
   key: "bidsState",
   default: [],

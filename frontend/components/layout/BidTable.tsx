@@ -29,7 +29,7 @@ function Bid({ price, quantity, total, maxTotal }: { price: string, quantity: st
             style={{
             position: "absolute",
             top: 0,
-            right: 0,
+            left: 0,
             width: `${(100 * total) / maxTotal}%`,
             height: "100%",
             background: "rgba(1, 250, 129, 0.325)",
