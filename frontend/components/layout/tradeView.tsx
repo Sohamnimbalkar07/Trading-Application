@@ -4,6 +4,7 @@ import { KLine } from "@/utils/types";
 import { klineParamsState, klineState } from "@/store/klines/klinesState";
 import { marketState } from "@/store/depth/depthState";
 import { useRecoilValue } from "recoil";
+import { SignalingManager } from "@/utils/SignalingManager";
 
 export function TradeView() {
   const chartRef = useRef<HTMLDivElement>(null);
@@ -42,14 +43,42 @@ export function TradeView() {
       }
     };
     init();
+    SignalingManager.getInstance().registerCallback(
+      "kline",
+      (data: any) => {
+        const newKline = {
+          time: new Date(data.timestamp).getTime() / 1000,
+          open: parseFloat(data.open),
+          high: parseFloat(data.high),
+          low: parseFloat(data.low),
+          close: parseFloat(data.close),
+        };
+
+        chartManagerRef.current.update(newKline);
+      },
+      `kline@${market}:1h`
+    );
+
+    SignalingManager.getInstance().sendMessage({
+      method: "SUBSCRIBE",
+      params: [`kline@${market}:1h`],
+    });
+
+    return () => {
+      SignalingManager.getInstance().sendMessage({
+        method: "UNSUBSCRIBE",
+        params: [`kline@${market}:1h`],
+      });
+      SignalingManager.getInstance().deRegisterCallback(
+        "kline",
+        `kline@${market}:1h`
+      );
+    };
   }, [market, chartRef]);
 
   return (
-    <div >
-      <div
-        ref={chartRef}
-        style={{ height: "530px", width: "100%" }}
-      ></div>
+    <div>
+      <div ref={chartRef} style={{ height: "530px", width: "100%" }}></div>
     </div>
   );
 }

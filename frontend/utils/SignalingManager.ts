@@ -58,6 +58,15 @@ export class SignalingManager {
             const updatedAsks = message.a;
             callback({ bids: updatedBids, asks: updatedAsks });
           }
+          if (type === "kline") {
+            const end = message.timestamp;
+            const open = message.open;
+            const close = message.close;
+            const high = message.high;
+            const low = message.low;
+            const volume = message.volume;
+            callback({end, open, close, high, low, volume});
+          }
         });
       }
     };
