@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useSetRecoilState, useRecoilValue, useRecoilState } from "recoil";
 import {
   bidsState,
@@ -7,7 +7,7 @@ import {
   priceState,
   depthState,
   marketState,
-  midPriceState
+  midPriceState,
 } from "@/store/depth/depthState";
 import { SignalingManager } from "@/utils/SignalingManager";
 import { AskTable } from "./AskTable";
@@ -15,8 +15,8 @@ import { BidTable } from "./BidTable";
 
 export const Depth = () => {
   const market = useRecoilValue(marketState);
-  const setBids = useSetRecoilState(bidsState);
-  const setAsks = useSetRecoilState(asksState);
+  const [bids, setBids] = useRecoilState(bidsState);
+  const [asks, setAsks] = useRecoilState(asksState);
   const setPrice = useSetRecoilState(priceState);
   const depthData = useRecoilValue(depthState);
   const [midPrice, setMidPrice] = useRecoilState(midPriceState);
@@ -31,7 +31,6 @@ export const Depth = () => {
           for (let i = 0; i < bidsAfterUpdate.length; i++) {
             for (let j = 0; j < data.bids.length; j++) {
               if (bidsAfterUpdate[i][0] === data.bids[j][0]) {
-                // bidsAfterUpdate[i][1] = data.bids[j][1];
                 bidsAfterUpdate[i] = [...bidsAfterUpdate[i]];
                 bidsAfterUpdate[i][1] = data.bids[j][1];
                 if (Number(bidsAfterUpdate[i][1]) === 0) {
@@ -63,7 +62,6 @@ export const Depth = () => {
           for (let i = 0; i < asksAfterUpdate.length; i++) {
             for (let j = 0; j < data.asks.length; j++) {
               if (asksAfterUpdate[i][0] === data.asks[j][0]) {
-                // asksAfterUpdate[i][1] = data.asks[j][1];
                 asksAfterUpdate[i] = [...asksAfterUpdate[i]];
                 asksAfterUpdate[i][1] = data.asks[j][1];
                 if (Number(asksAfterUpdate[i][1]) === 0) {
@@ -88,7 +86,6 @@ export const Depth = () => {
           );
           return asksAfterUpdate;
         });
-       
       },
       `DEPTH-${market}`
     );
@@ -113,15 +110,34 @@ export const Depth = () => {
     };
   }, []);
 
+  const highestBid = useMemo(() => {
+    return bids.length > 0 ? Math.max(...bids.map((b) => Number(b[0]))) : 0;
+  }, [bids]);
+
+  const lowestAsk = useMemo(() => {
+    return asks.length > 0 ? Math.min(...asks.map((a) => Number(a[0]))) : 0;
+  }, [asks]);
+
+  const midPriceValue = useMemo(() => {
+    return (highestBid + lowestAsk) / 2;
+  }, [highestBid, lowestAsk]);
+
+  useEffect(() => {
+    setMidPrice(midPriceValue);
+  }, [midPriceValue]);
+
   return (
-    <div className="border-l-2 bg-slate-950 border-slate-700" >
+    <div className="border-l-2 bg-slate-950 border-slate-700">
       <div className="flex gap-7 h-6 p-1 px-2 bg-black">
-        <div className="text-slate-100 font-normal cursor-pointer">Depth</div>
+        <div className="text-slate-100 font-normal cursor-pointer">
+          Depth
+        </div>
         <div className="text-slate-100 font-normal cursor-pointer">Trade</div>
       </div>
       <TableHeader />
-      <AskTable/>
-      <BidTable/>
+      <AskTable />
+      <div className="text-slate-50 px-3">{midPrice.toFixed(2)}</div>
+      <BidTable />
     </div>
   );
 };

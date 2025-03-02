@@ -28,7 +28,7 @@ export default function Page() {
           </div> 
         </div>
         <div className="col-span-3 h-full">
-          <SwapUI />
+          <SwapUI market={market as string} />
         </div>
       </div>
     </div>

@@ -1,6 +1,6 @@
 "use client";
 import { IndianRupee } from "lucide-react";
-import { useSetRecoilState, useRecoilValue, useRecoilState } from "recoil";
+import { useRecoilValue, useRecoilState } from "recoil";
 import { tickerState, tickerSelector } from "@/store/ticker/tickerState";
 import { useEffect } from "react";
 
