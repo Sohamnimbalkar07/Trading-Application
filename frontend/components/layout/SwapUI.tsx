@@ -1,32 +1,114 @@
 "use Client";
 
 import { IndianRupee } from "lucide-react";
+import { useState } from "react";
+import { useRecoilState, useSetRecoilState } from "recoil";
+import { orderState } from "@/store/swap/swapState";
+import { useToast } from "@/components/ui/use-toast";
+import axios from "axios";
 
-export const SwapUI = () => {
+export const SwapUI = ({ market }: { market: string }) => {
+  const [activeTab, setActiveTab] = useState("buy");
+  const [type, setType] = useState("limit");
+  const [order, setOrder] = useRecoilState(orderState);
+  const { toast } = useToast();
+
+  const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
+
+  const handleSubmit = async () => {
+    const newOrder = {
+      market,
+      price: order.price,
+      quantity: order.quantity,
+      side: activeTab,
+      userId: "5",
+    };
+    try {
+      const response = await axios.post(`${BASE_URL}/order`, newOrder, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      setOrder({
+        price: 0,
+        quantity: 0,
+        side: "",
+        userId: "5",
+        market: "TATA_INR",
+      });
+
+      if (response.data?.orderId) {
+        toast({
+          variant: "success",
+          description: "Order Placed Successfully!",
+        });
+      }
+    } catch (error) {
+      console.error("Error placing order:", error);
+      toast({
+        variant: "destructive",
+        description: "Failed to Place Order.",
+      });
+    }
+  };
+
   return (
     <div className="border-l bg-slate-950 border-slate-700 text-slate-100 h-full">
       <div className="grid grid-cols-2">
-        <BuyButton />
-        <SellButton />
+        <BuyButton activeTab={activeTab} setActiveTab={setActiveTab} />
+        <SellButton activeTab={activeTab} setActiveTab={setActiveTab} />
       </div>
-      <div className="flex gap-7 mx-4 h-8">
-        <div className="text-slate-100 font-normal cursor-pointer">Limit</div>
-        <div className="text-slate-100 font-normal cursor-pointer">Market</div>
+      <div className="flex gap-7 mx-4 h-8 my-2">
+        <div
+          className={`text-slate-100 font-normal cursor-pointer border-b-2 ${
+            type === "limit"
+              ? "border-accentBlue text-baseTextHighEmphasis"
+              : "border-transparent text-baseTextMedEmphasis hover:border-baseTextHighEmphasis hover:text-baseTextHighEmphasis"
+          }`}
+          onClick={() => setType("limit")}
+        >
+          Limit
+        </div>
+        <div
+          className={`text-slate-100 font-normal cursor-pointer border-b-2 ${
+            type === "market"
+              ? "border-accentBlue text-baseTextHighEmphasis"
+              : "border-b-2 border-transparent text-baseTextMedEmphasis hover:border-baseTextHighEmphasis hover:text-baseTextHighEmphasis"
+          } `}
+          onClick={() => setType("market")}
+        >
+          Market
+        </div>
       </div>
       <div className="flex mx-4 text-slate-100 h-8 justify-between items-center font-light text-sm">
         <div>Available Balance</div>
         <div className="flex justify-center items-center">
-        <IndianRupee className="h-4" />
-        <div className="font-medium">36.94</div>
+          <IndianRupee className="h-4" />
+          <div className="font-medium">56456.94</div>
         </div>
       </div>
       <div className="mx-4 font-normal text-sm mt-1">
         <div className="text">Price</div>
-        <input className="w-full h-11 rounded-lg my-2 border-slate-300 border-2 text-slate-900 p-2"></input>
+        <input
+          type="string"
+          className="w-full h-11 rounded-lg my-2 border-slate-300 border-2 text-slate-900 p-2"
+          value={order.price}
+          onChange={(e) =>
+            setOrder({ ...order, price: Number(e.target.value) })
+          }
+        ></input>
       </div>
       <div className="mx-4 font-normal text-sm mt-1">
         <div className="text">Quantity</div>
-        <input className="w-full h-11 rounded-lg my-2 border-slate-300 border-2 text-slate-900 p-2"></input>
+        <input
+          type="string"
+          className="w-full h-11 rounded-lg my-2 border-slate-300 border-2 text-slate-900 p-2"
+          value={order.quantity}
+          onChange={(e) =>
+            setOrder({ ...order, quantity: Number(e.target.value) })
+          }
+        ></input>
       </div>
       <div className="flex justify-between items-center mx-4 my-2 h-10">
         <div className="bg-slate-100 text-black p-1 rounded-xl h-7 text-center w-14 font-medium cursor-pointer">
@@ -45,26 +127,55 @@ export const SwapUI = () => {
       <div className="m-4 font-normal text-sm mt-1">
         <button
           type="submit"
-          className="h-14 w-full rounded-lg bg-green-600 p-2 text-white-200 font-semibold text-xl"
+          onClick={handleSubmit}
+          className={`h-14 w-full rounded-lg p-2 text-white-200 font-semibold text-xl ${
+            activeTab === "buy" ? "bg-green-600" : "bg-red-500"
+          }`}
         >
-          Buy
+          {activeTab === "buy" ? "Buy" : "Sell"}
         </button>
       </div>
     </div>
   );
 };
 
-const BuyButton = () => {
+const BuyButton = ({
+  activeTab,
+  setActiveTab,
+}: {
+  activeTab: string;
+  setActiveTab: any;
+}) => {
   return (
-    <div className="col-span-1 h-16 text-green-500 flex items-center justify-center cursor-pointer">
+    <div
+      className={`col-span-1 h-16 border-b-2 text-green-500 flex items-center justify-center cursor-pointer ${
+        activeTab === "buy"
+          ? "border-b-greenBorder bg-greenBackgroundTransparent"
+          : "border-b-baseBorderMed hover:border-b-baseBorderFocus"
+      }`}
+      onClick={() => setActiveTab("buy")}
+    >
       <span className="text-center font-medium">Buy</span>
     </div>
   );
 };
 
-const SellButton = () => {
+const SellButton = ({
+  activeTab,
+  setActiveTab,
+}: {
+  activeTab: string;
+  setActiveTab: any;
+}) => {
   return (
-    <div className="col-span-1 h-16 text-red-600 flex items-center justify-center cursor-pointer">
+    <div
+      className={`col-span-1 border-b-2 h-16 text-red-600 flex items-center justify-center cursor-pointer ${
+        activeTab === "sell"
+          ? "border-b-redBorder bg-redBackgroundTransparent"
+          : "border-b-baseBorderMed hover:border-b-baseBorderFocus"
+      }`}
+      onClick={() => setActiveTab("sell")}
+    >
       <span className="text-center font-medium">Sell</span>
     </div>
   );

@@ -54,7 +54,7 @@ function Ask({
         style={{
           position: "absolute",
           top: 0,
-          right: 0,
+          left: 0,
           width: `${(100 * total) / maxTotal}%`,
           height: "100%",
           background: "rgba(228, 75, 68, 0.325)",

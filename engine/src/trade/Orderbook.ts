@@ -1,6 +1,7 @@
 import { BASE_CURRENCY } from "./Engine";
 import { binarySearch } from "../binarySearch";
 import { RedisManager } from "../RedisManager";
+import { getTickerData } from "../dbConnection";
 
 export interface Order {
   price: number;
@@ -63,13 +64,17 @@ export class Orderbook {
     if (order.side === "buy") {
       const { executedQty, fills } = this.matchBid(order);
       order.filled = executedQty;
+      if(fills.length !== 0) {
+      this.currentPrice = Number(fills[fills.length - 1].price);
+      this.updateTicker(executedQty);
+      }
       if (executedQty === order.quantity) {
         return {
           executedQty,
           fills,
         };
       }
-      // this.bids.push(order);
+
       this.bids.splice(binarySearch(this.bids, order), 0, order);
       return {
         executedQty,
@@ -78,13 +83,17 @@ export class Orderbook {
     } else {
       const { executedQty, fills } = this.matchAsk(order);
       order.filled = executedQty;
+      if(fills.length !== 0) {
+      this.currentPrice = Number(fills[fills.length - 1].price);
+      this.updateTicker(executedQty);
+      }
       if (executedQty === order.quantity) {
         return {
           executedQty,
           fills,
         };
       }
-      // this.asks.push(order);
+
       this.asks.splice(binarySearch(this.asks, order), 0, order);
       return {
         executedQty,
@@ -117,7 +126,7 @@ export class Orderbook {
         this.updateKline(
           this.baseAsset,
           "1h",
-          new Date().toISOString(),  //Math.floor(Date.now() / 1000)
+          new Date().toISOString(), //Math.floor(Date.now() / 1000)
           this.asks[i].price.toString(),
           filledQty.toString()
         );
@@ -245,14 +254,13 @@ export class Orderbook {
     price: string,
     volume: string
   ) {
-    // const bucket = timestamp - (timestamp % 3600);
     const bucket = new Date(
       Math.floor(new Date(timestamp).getTime() / 3600000) * 3600000
     ).toISOString();
     const key = `kline:${symbol}:${interval}`;
     const exists = await RedisManager.getInstance().keyExists(key);
     if (!exists) {
-      await RedisManager.getInstance().addKlineData(key, {
+      await RedisManager.getInstance().addhSetData(key, {
         timestamp: bucket.toString(),
         open: price,
         high: price,
@@ -261,39 +269,95 @@ export class Orderbook {
         volume: volume,
       });
     } else {
-      const klineData = await RedisManager.getInstance().getAllKlineData(key);
+      const klineData = await RedisManager.getInstance().getAllhSetData(key);
       if (klineData.close !== price) {
-        await RedisManager.getInstance().updateKlineField(key, "close", price);
+        await RedisManager.getInstance().updatehSetField(key, "close", price);
       }
       if (klineData.timestamp !== bucket.toString()) {
-        await RedisManager.getInstance().updateKlineField(
+        await RedisManager.getInstance().updatehSetField(
           key,
           "timestamp",
           bucket.toString()
         );
       }
 
-      await RedisManager.getInstance().updateKlineField(
+      await RedisManager.getInstance().updatehSetField(
         key,
         "volume",
         (parseFloat(klineData.volume) + parseFloat(volume)).toString()
       );
 
       if (parseFloat(klineData.high) < parseFloat(price)) {
-        await RedisManager.getInstance().updateKlineField(key, "high", price);
+        await RedisManager.getInstance().updatehSetField(key, "high", price);
       }
 
       if (parseFloat(klineData.low) > parseFloat(price)) {
-        await RedisManager.getInstance().updateKlineField(key, "low", price);
+        await RedisManager.getInstance().updatehSetField(key, "low", price);
       }
     }
 
-    const updatedKline = await RedisManager.getInstance().getAllKlineData(key);
+    const updatedKline = await RedisManager.getInstance().getAllhSetData(key);
     RedisManager.getInstance().publishMessage(`kline@${symbol}:${interval}`, {
       stream: `kline@${symbol}:${interval}`,
       data: {
         ...updatedKline,
         e: "kline",
+      },
+    });
+  }
+
+  async updateTicker(executedQty: number) {
+    const key = `${this.baseAsset}_${this.quoteAsset}`;
+    const currentPrice = this.currentPrice;
+    const exists = await RedisManager.getInstance().keyExists(key);
+    if (!exists) {
+      const ticker = await getTickerData(this.baseAsset);
+      await RedisManager.getInstance().addhSetData(key, ticker);
+    } else {
+      const tickerData = await RedisManager.getInstance().getAllhSetData(key);
+      if (Number(tickerData.high) < currentPrice) {
+        await RedisManager.getInstance().updatehSetField(
+          key,
+          "high",
+          currentPrice.toString()
+        );
+      }
+      if (Number(tickerData.low) > currentPrice) {
+        await RedisManager.getInstance().updatehSetField(
+          key,
+          "low",
+          currentPrice.toString()
+        );
+      }
+      await RedisManager.getInstance().updatehSetField(
+        key,
+        "lastPrice",
+        currentPrice.toString()
+      );
+      await RedisManager.getInstance().updatehSetField(
+        key,
+        "volume",
+        (Number(tickerData.volume) + executedQty).toString()
+      );
+      const priceChange = Number(currentPrice) - Number(tickerData.firstPrice);
+      await RedisManager.getInstance().updatehSetField(
+        key,
+        "priceChange",
+        priceChange.toString()
+      );
+      await RedisManager.getInstance().updatehSetField(
+        key,
+        "priceChangePercent",
+        ((priceChange / Number(tickerData.firstPrice)) * 100).toString()
+      );
+    }
+
+    const updatedTicker = await RedisManager.getInstance().getAllhSetData(key);
+    RedisManager.getInstance().publishMessage(`ticker@${key}`, {
+      stream: `ticker@${key}`,
+      data: {
+        ...updatedTicker,
+        e: "ticker",
       },
     });
   }

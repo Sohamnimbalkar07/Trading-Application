@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import Appbar from "@/components/layout/Appbar";
 import RecoilContextProvider from "@/lib/recoilContextProvider";
 import "./globals.css";
+import { Toaster} from "@/components/ui/toaster";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -33,6 +34,7 @@ export default function RootLayout({
         <RecoilContextProvider>
         <Appbar/>
         {children}
+        <Toaster />
         </RecoilContextProvider>
       </body>
     </html>
