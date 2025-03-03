@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 import { Marketbar } from "@/components/layout/Marketbar";
 import { SwapUI } from "@/components/layout/SwapUI";
 import { Depth } from "@/components/layout/Depth";
-import { SetRecoilState, useSetRecoilState } from "recoil";
+import { useSetRecoilState } from "recoil";
 import { marketState } from "@/store/depth/depthState";
 import { TradeView } from "@/components/layout/tradeView";
 
