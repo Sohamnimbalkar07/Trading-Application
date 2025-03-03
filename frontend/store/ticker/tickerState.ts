@@ -14,8 +14,8 @@ export const tickerState = atom<Ticker>({
     low: 0,
     lastPrice: 0,
     volume: 0,
-    priceChange: "0.00",
-    priceChangePercent: "0.00",
+    priceChange: 0.00,
+    priceChangePercent: 0.00
   },
 });
 

@@ -1,10 +1,15 @@
-import { Router } from "express";
-import pool from "../dbConnection";
+import { Pool } from "pg";
 
-export const tickersRouter = Router();
+export const pool = new Pool({
+  user: "postgres",
+  host: "localhost",
+  database: "exchange",
+  password: "password",
+  port: 5432,
+});
 
-tickersRouter.get("/", async (req, res) => {
-  const { symbol } = req.query;
+export async function getTickerData(market: string): Promise<any> {
+
   const query = `select
         min(time) as startTime,
         first(price, time) as firstPrice,
@@ -24,15 +29,15 @@ tickersRouter.get("/", async (req, res) => {
   const priceChangePercent = (priceChange / firstPrice) * 100;
 
   const response = {
-    startTime: tickerData.starttime,
+    startTime: tickerData.starttime.toISOString(),
     firstPrice: tickerData.firstprice,
     high: tickerData.high,
     low: tickerData.low,
     lastPrice: tickerData.lastprice,
     volume: tickerData.volume,
-    priceChange: Number(priceChange.toFixed(2)),
-    priceChangePercent: Number(priceChangePercent.toFixed(2)),
+    priceChange: priceChange.toFixed(2),
+    priceChangePercent: priceChangePercent.toFixed(2),
   };
 
-  res.json(response);
-});
+  return response;
+}

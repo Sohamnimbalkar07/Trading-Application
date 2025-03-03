@@ -17,7 +17,6 @@ export const Depth = () => {
   const market = useRecoilValue(marketState);
   const [bids, setBids] = useRecoilState(bidsState);
   const [asks, setAsks] = useRecoilState(asksState);
-  const setPrice = useSetRecoilState(priceState);
   const depthData = useRecoilValue(depthState);
   const [midPrice, setMidPrice] = useRecoilState(midPriceState);
 

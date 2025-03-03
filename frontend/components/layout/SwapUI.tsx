@@ -44,7 +44,6 @@ export const SwapUI = ({ market }: { market: string }) => {
           description: "Order Placed Successfully!",
         });
       }
-      console.log("Order placed successfully:", response.data);
     } catch (error) {
       console.error("Error placing order:", error);
       toast({
@@ -86,7 +85,7 @@ export const SwapUI = ({ market }: { market: string }) => {
         <div>Available Balance</div>
         <div className="flex justify-center items-center">
           <IndianRupee className="h-4" />
-          <div className="font-medium">36.94</div>
+          <div className="font-medium">56456.94</div>
         </div>
       </div>
       <div className="mx-4 font-normal text-sm mt-1">

@@ -67,25 +67,25 @@ export class RedisManager {
     return (await this.client.exists(key)) > 0;
   }
 
-  public async addKlineData(
+  public async addhSetData(
     key: string,
     data: Record<string, string>
   ): Promise<void> {
     await this.client.hSet(key, data);
   }
 
-  public async getKlineField(
+  public async gethSetField(
     key: string,
     field: string
   ): Promise<string | null> {
     return (await this.client.hGet(key, field)) ?? null;
   }
 
-  public async updateKlineField(key: string, field: string, value: string) {
+  public async updatehSetField(key: string, field: string, value: string) {
     return await this.client.hSet(key, field, value);
   }
 
-  public async getAllKlineData(key: string): Promise<{ [x: string]: string }> {
+  public async getAllhSetData(key: string): Promise<{ [x: string]: string }> {
     return await this.client.hGetAll(key);
   }
 }

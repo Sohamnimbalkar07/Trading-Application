@@ -56,7 +56,7 @@ export function TradeView() {
 
         chartManagerRef.current.update(newKline);
       },
-      `kline@${market}:1h`
+      `KLINE-${market}`
     );
 
     SignalingManager.getInstance().sendMessage({

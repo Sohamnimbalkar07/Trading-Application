@@ -32,6 +32,6 @@ export interface Ticker {
   low: number;
   lastPrice: number;
   volume: number;
-  priceChange: string;
-  priceChangePercent: string;
+  priceChange: number;
+  priceChangePercent: number;
 }
