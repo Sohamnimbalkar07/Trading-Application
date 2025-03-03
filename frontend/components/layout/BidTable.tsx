@@ -1,5 +1,4 @@
 import { bidsState } from "@/store/depth/depthState";
-import { ColorType } from "lightweight-charts";
 import { useRecoilValue } from "recoil";
 
 export const BidTable = () => {

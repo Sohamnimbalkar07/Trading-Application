@@ -1,7 +1,8 @@
+/* eslint-disable */
 import { useEffect, useRef } from "react";
 import { ChartManager } from "@/utils/ChartManager";
 import { KLine } from "@/utils/types";
-import { klineParamsState, klineState } from "@/store/klines/klinesState";
+import { klineState } from "@/store/klines/klinesState";
 import { marketState } from "@/store/depth/depthState";
 import { useRecoilValue } from "recoil";
 import { SignalingManager } from "@/utils/SignalingManager";
@@ -17,7 +18,9 @@ export function TradeView() {
       let klineData: KLine[] = [];
       try {
         klineData = klines;
-      } catch (e) {}
+      } catch (e) {
+        console.error(e)
+      }
 
       if (chartRef) {
         if (chartManagerRef.current) {
@@ -45,7 +48,13 @@ export function TradeView() {
     init();
     SignalingManager.getInstance().registerCallback(
       "kline",
-      (data: any) => {
+      (data: {
+        timestamp : string,
+        open: string,
+        high: string,
+        low: string,
+        close: string
+      }) => {
         const newKline = {
           time: new Date(data.timestamp).getTime() / 1000,
           open: parseFloat(data.open),

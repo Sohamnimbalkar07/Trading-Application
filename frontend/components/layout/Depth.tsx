@@ -1,10 +1,9 @@
 "use client";
 import { useEffect, useMemo } from "react";
-import { useSetRecoilState, useRecoilValue, useRecoilState } from "recoil";
+import { useRecoilValue, useRecoilState } from "recoil";
 import {
   bidsState,
   asksState,
-  priceState,
   depthState,
   marketState,
   midPriceState,
@@ -23,7 +22,7 @@ export const Depth = () => {
   useEffect(() => {
     SignalingManager.getInstance().registerCallback(
       "depth",
-      (data: any) => {
+      (data: { asks: [string, string][]; bids: [string, string][] }) => {
         setBids((originalBids) => {
           const bidsAfterUpdate = [...(originalBids || [])];
 
@@ -56,7 +55,7 @@ export const Depth = () => {
         });
 
         setAsks((originalAsks) => {
-          let asksAfterUpdate = [...(originalAsks || [])];
+           const asksAfterUpdate = [...(originalAsks || [])];
 
           for (let i = 0; i < asksAfterUpdate.length; i++) {
             for (let j = 0; j < data.asks.length; j++) {
@@ -128,9 +127,7 @@ export const Depth = () => {
   return (
     <div className="border-l-2 bg-slate-950 border-slate-700">
       <div className="flex gap-7 h-6 p-1 px-2 bg-black">
-        <div className="text-slate-100 font-normal cursor-pointer">
-          Depth
-        </div>
+        <div className="text-slate-100 font-normal cursor-pointer">Depth</div>
         <div className="text-slate-100 font-normal cursor-pointer">Trade</div>
       </div>
       <TableHeader />

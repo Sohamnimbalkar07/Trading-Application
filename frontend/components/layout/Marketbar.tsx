@@ -1,9 +1,9 @@
 "use client";
-import { IndianRupee } from "lucide-react";
 import { useRecoilValue, useRecoilState } from "recoil";
 import { tickerState, tickerSelector } from "@/store/ticker/tickerState";
 import { useEffect } from "react";
 import { SignalingManager } from "@/utils/SignalingManager";
+import { Ticker as tickerType } from "@/utils/types";
 
 export const Marketbar = ({ market }: { market: string }) => {
   const tickerData = useRecoilValue(tickerSelector);
@@ -12,9 +12,8 @@ export const Marketbar = ({ market }: { market: string }) => {
   useEffect(() => {
     SignalingManager.getInstance().registerCallback(
       "ticker",
-      (data: any) => {
-        console.log("data", data);
-        setTicker((prevTicker) => data);
+      (data: tickerType) => {
+        setTicker(() => data);
       },
       `TICKER-${market}`
     );
@@ -39,7 +38,7 @@ export const Marketbar = ({ market }: { market: string }) => {
 
   return (
     <div className="h-16 px-4 bg-black flex items-center gap-10 border-b border-slate-700">
-      <Ticker market={market} />
+      <Ticker  />
       <div className="flex flex-col text-white items-center">
         <div className="font-normal">Rs. {ticker.lastPrice.toFixed(2)}</div>
         { ticker && <div
@@ -83,7 +82,7 @@ export const Marketbar = ({ market }: { market: string }) => {
   );
 };
 
-function Ticker({ market }: { market: string }) {
+function Ticker() {
   return (
     <div>
       <div className="flex relative">

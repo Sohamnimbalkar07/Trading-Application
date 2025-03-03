@@ -1,8 +1,9 @@
 "use Client";
 
+import React from "react";
 import { IndianRupee } from "lucide-react";
 import { useState } from "react";
-import { useRecoilState, useSetRecoilState } from "recoil";
+import { useRecoilState } from "recoil";
 import { orderState } from "@/store/swap/swapState";
 import { useToast } from "@/components/ui/use-toast";
 import axios from "axios";
@@ -144,7 +145,7 @@ const BuyButton = ({
   setActiveTab,
 }: {
   activeTab: string;
-  setActiveTab: any;
+  setActiveTab: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   return (
     <div
@@ -165,7 +166,7 @@ const SellButton = ({
   setActiveTab,
 }: {
   activeTab: string;
-  setActiveTab: any;
+  setActiveTab: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   return (
     <div
