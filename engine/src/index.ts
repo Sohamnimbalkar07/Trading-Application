@@ -5,7 +5,9 @@ dotenv.config();
 
 async function main() {
   const engine = new Engine();
-  const redisClient = createClient();
+  const redisClient = createClient({
+    url: process.env.REDIS_URL
+  });
   await redisClient.connect();
 
   while (true) {

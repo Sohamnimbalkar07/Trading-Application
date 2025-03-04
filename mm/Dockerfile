@@ -6,7 +6,10 @@ COPY package* .
 
 RUN npm install
 
+RUN npm install -g typescript
+
 COPY . .
+
 RUN npm run build
 
-CMD ["node", "run", "start"]
+CMD ["npm", "start"]
