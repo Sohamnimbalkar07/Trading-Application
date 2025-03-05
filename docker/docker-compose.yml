@@ -1,4 +1,4 @@
-version: "3.8"  # Use a modern version
+version: "1.1"
 
 networks:
   app_network:
@@ -35,8 +35,12 @@ services:
       - redis
       - db
     environment:
-      - REDIS_HOST=${REDIS_HOST}
-      - DB_HOST=${DB_HOST}
+      - DATABASE_USER=${DATABASE_USER}
+      - DATABASE_HOST=${DATABASE_HOST}
+      - DATABASE_NAME=${DATABASE_NAME}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - DATABASE_PORT=${DATABASE_PORT}
+      - REDIS_URL=${REDIS_URL}
     networks:
       - app_network
 
@@ -47,7 +51,13 @@ services:
       - redis
       - api
     environment:
-      - REDIS_HOST=${REDIS_HOST}
+      - WITH_SNAPSHOT=${WITH_SNAPSHOT}
+      - DATABASE_USER=${DATABASE_USER}
+      - DATABASE_HOST=${DATABASE_HOST}
+      - DATABASE_NAME=${DATABASE_NAME}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - DATABASE_PORT=${DATABASE_PORT}
+      - REDIS_URL=${REDIS_URL}
     networks:
       - app_network
 
@@ -61,7 +71,7 @@ services:
       - api
       - engine
     environment:
-      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_URL=${REDIS_URL}
     networks:
       - app_network
 
@@ -72,8 +82,12 @@ services:
       - redis
       - db
     environment:
-      - REDIS_HOST=${REDIS_HOST}
-      - DB_HOST=${DB_HOST}
+      - DATABASE_USER=${DATABASE_USER}
+      - DATABASE_HOST=${DATABASE_HOST}
+      - DATABASE_NAME=${DATABASE_NAME}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - DATABASE_PORT=${DATABASE_PORT}
+      - REDIS_URL=${REDIS_URL}
     networks:
       - app_network
 
@@ -82,6 +96,7 @@ services:
     container_name: mm
     environment:
       - BACKEND_URL=${BACKEND_URL}
+      - REDIS_URL=${REDIS_URL}
     networks:
       - app_network
 

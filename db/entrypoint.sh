@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
 
-npm run start &
+npm start &
 npm run refresh:views
 wait
