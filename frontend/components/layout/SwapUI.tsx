@@ -1,18 +1,33 @@
-"use Client";
+"use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { IndianRupee } from "lucide-react";
-import { useState } from "react";
 import { useRecoilState } from "recoil";
 import { orderState } from "@/store/swap/swapState";
 import { useToast } from "@/components/ui/use-toast";
 import axios from "axios";
+import { OrderResponse } from "./OrderResponse";
+
+
+interface OrderResponseData {
+  orderId: string;
+  executedQty: number;
+  fills: Array<{
+    price: string;
+    qty: number;
+    tradeId: number;
+    otherUserId: string;
+    markerOrderId: string;
+    isBuyerMaker: boolean;
+  }>;
+}
 
 export const SwapUI = ({ market }: { market: string }) => {
   const [activeTab, setActiveTab] = useState("buy");
   const [type, setType] = useState("limit");
   const [order, setOrder] = useRecoilState(orderState);
   const { toast } = useToast();
+  const [orderResponse, setOrderResponse] = useState<OrderResponseData | null>(null);
 
   const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
 
@@ -40,6 +55,7 @@ export const SwapUI = ({ market }: { market: string }) => {
       });
 
       if (response.data?.orderId) {
+        setOrderResponse(response.data);
         toast({
           variant: "success",
           description: "Order Placed Successfully!",
@@ -60,7 +76,7 @@ export const SwapUI = ({ market }: { market: string }) => {
         <BuyButton activeTab={activeTab} setActiveTab={setActiveTab} />
         <SellButton activeTab={activeTab} setActiveTab={setActiveTab} />
       </div>
-      <div className="flex gap-7 mx-4 h-8 my-2">
+      <div className="flex gap-7 h-8 mx-4 my-2">
         <div
           className={`text-slate-100 font-normal cursor-pointer border-b-2 ${
             type === "limit"
@@ -82,14 +98,14 @@ export const SwapUI = ({ market }: { market: string }) => {
           Market
         </div>
       </div>
-      <div className="flex mx-4 text-slate-100 h-8 justify-between items-center font-light text-sm">
+      <div className="flex text-slate-100 h-8 mx-4 justify-between items-center font-light text-sm">
         <div>Available Balance</div>
         <div className="flex justify-center items-center">
           <IndianRupee className="h-4" />
           <div className="font-medium">56456.94</div>
         </div>
       </div>
-      <div className="mx-4 font-normal text-sm mt-1">
+      <div className="font-normal text-sm mt-1 mx-4">
         <div className="text">Price</div>
         <input
           type="string"
@@ -100,7 +116,7 @@ export const SwapUI = ({ market }: { market: string }) => {
           }
         ></input>
       </div>
-      <div className="mx-4 font-normal text-sm mt-1">
+      <div className="font-normal text-sm  mx-4 mt-1">
         <div className="text">Quantity</div>
         <input
           type="string"
@@ -111,7 +127,7 @@ export const SwapUI = ({ market }: { market: string }) => {
           }
         ></input>
       </div>
-      <div className="flex justify-between items-center mx-4 my-2 h-10">
+      <div className="flex justify-between items-center my-2 h-10 mx-4">
         <div className="bg-slate-100 text-black p-1 rounded-xl h-7 text-center w-14 font-medium cursor-pointer">
           25 %
         </div>
@@ -125,7 +141,7 @@ export const SwapUI = ({ market }: { market: string }) => {
           Max
         </div>
       </div>
-      <div className="m-4 font-normal text-sm mt-1">
+      <div className="font-normal text-sm mt-1 mx-4">
         <button
           type="submit"
           onClick={handleSubmit}
@@ -136,6 +152,16 @@ export const SwapUI = ({ market }: { market: string }) => {
           {activeTab === "buy" ? "Buy" : "Sell"}
         </button>
       </div>
+
+      {orderResponse && (
+        <div className="mt-4 mx-4">
+          <OrderResponse
+            orderId={orderResponse.orderId}
+            executedQty={orderResponse.executedQty}
+            fills={orderResponse.fills}
+          />
+        </div>
+      )}
     </div>
   );
 };

@@ -36,13 +36,13 @@ function Bid({ price, quantity, total, maxTotal }: { price: string, quantity: st
             }}
         ></div>
             <div className={`flex justify-between text-xs w-full text-white px-3`}>
-                <div>
+                <div className="flex-1 text-left">
                     {price}
                 </div>
-                <div>
+                <div className="flex-1 text-center">
                     {Number(quantity).toFixed(2)}
                 </div>
-                <div>
+                <div className="flex-1 text-right">
                     {total.toFixed(2)}
                 </div>
             </div>
