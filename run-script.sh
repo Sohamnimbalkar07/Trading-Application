@@ -6,7 +6,7 @@ npm run start &
 
 cd ..
 cd "engine"
-npm run dev &
+npm run start &
 
 cd ..
 cd "ws"
@@ -14,7 +14,8 @@ npm run start &
 
 cd ..
 cd "db"
-npm run start
+npm run start &
+sleep 10
 npm run refresh:views &
 
 cd ..

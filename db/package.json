@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "main": "dist/index.js",
   "scripts": {
-    "start": "tsc && node --env-file=.env dist/index.js",
-    "seed:db": "tsc && node --env-file=.env dist/seed-db.js",
-    "refresh:views": "tsc && node --env-file=.env dist/cron.js",
+    "build": "tsc -b",
+    "start": "node --env-file=.env dist/index.js",
+    "seed:db": "node --env-file=.env dist/seed-db.js",
+    "refresh:views": "node --env-file=.env dist/cron.js",
     "lint": "eslint .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

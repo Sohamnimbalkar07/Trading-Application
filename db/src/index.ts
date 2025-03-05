@@ -1,9 +1,10 @@
 import { createClient } from "redis";
 import { processDbUpdates } from "./dbUpdates";
 
-
 async function main() {
-  const redisClient = createClient();
+  const redisClient = createClient({
+    url: process.env.REDIS_URL
+  });
   await redisClient.connect();
 
   while (true) {
