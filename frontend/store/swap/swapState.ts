@@ -1,4 +1,5 @@
 import { atom } from "recoil";
+import { OrderResponseData } from "@/utils/types";
 
 export const orderState = atom({
   key: "orderState",
@@ -9,4 +10,9 @@ export const orderState = atom({
     side: "",
     userId: "",
   },
+});
+
+export const orderResponseState = atom<OrderResponseData | null>({
+  key: "orderResponseState",
+  default: null,
 });

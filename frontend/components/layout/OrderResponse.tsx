@@ -2,23 +2,10 @@
 
 import React from "react";
 import { IndianRupee } from "lucide-react";
+import { OrderResponseData } from "@/utils/types";
 
-interface Fill {
-  price: string;
-  qty: number;
-  tradeId: number;
-  otherUserId: string;
-  markerOrderId: string;
-  isBuyerMaker: boolean;
-}
 
-interface OrderResponseProps {
-  orderId: string;
-  executedQty: number;
-  fills: Fill[];
-}
-
-export const OrderResponse = ({ orderId, executedQty, fills }: OrderResponseProps) => {
+export const OrderResponse = ({ orderId, executedQty, fills }: OrderResponseData) => {
   return (
     <div className="p-4 bg-slate-800 rounded-lg text-slate-100">
       <div className="mb-4">
@@ -50,12 +37,6 @@ export const OrderResponse = ({ orderId, executedQty, fills }: OrderResponseProp
               <div className="flex justify-between items-center">
                 <div className="text-sm">Trade ID</div>
                 <div className="font-semibold">{fill.tradeId}</div>
-              </div>
-              <div className="flex justify-between items-center">
-                <div className="text-sm">Maker/Taker</div>
-                <div className="font-semibold">
-                  {fill.isBuyerMaker ? "Maker" : "Taker"}
-                </div>
               </div>
             </div>
           ))}

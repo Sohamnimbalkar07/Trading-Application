@@ -4,6 +4,7 @@ import Appbar from "@/components/layout/Appbar";
 import RecoilContextProvider from "@/lib/recoilContextProvider";
 import "./globals.css";
 import { Toaster} from "@/components/ui/toaster";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -30,7 +31,7 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      > 
         <RecoilContextProvider>
         <Appbar/>
         {children}

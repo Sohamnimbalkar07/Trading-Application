@@ -7,27 +7,17 @@ import { orderState } from "@/store/swap/swapState";
 import { useToast } from "@/components/ui/use-toast";
 import axios from "axios";
 import { OrderResponse } from "./OrderResponse";
-
-
-interface OrderResponseData {
-  orderId: string;
-  executedQty: number;
-  fills: Array<{
-    price: string;
-    qty: number;
-    tradeId: number;
-    otherUserId: string;
-    markerOrderId: string;
-    isBuyerMaker: boolean;
-  }>;
-}
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { orderResponseState } from "@/store/swap/swapState";
 
 export const SwapUI = ({ market }: { market: string }) => {
   const [activeTab, setActiveTab] = useState("buy");
   const [type, setType] = useState("limit");
   const [order, setOrder] = useRecoilState(orderState);
   const { toast } = useToast();
-  const [orderResponse, setOrderResponse] = useState<OrderResponseData | null>(null);
+  const [orderResponse, setOrderResponse] = useRecoilState(orderResponseState);
+
+  const [showOrderResponse, setShowOrderResponse] = useState(false);
 
   const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
 
@@ -56,6 +46,7 @@ export const SwapUI = ({ market }: { market: string }) => {
 
       if (response.data?.orderId) {
         setOrderResponse(response.data);
+        setShowOrderResponse(true);
         toast({
           variant: "success",
           description: "Order Placed Successfully!",
@@ -71,7 +62,8 @@ export const SwapUI = ({ market }: { market: string }) => {
   };
 
   return (
-    <div className="border-l bg-slate-950 border-slate-700 text-slate-100 h-full">
+    <ScrollArea className="h-screen">
+    <div className="border-l bg-slate-950 border-slate-700 text-slate-100">
       <div className="grid grid-cols-2">
         <BuyButton activeTab={activeTab} setActiveTab={setActiveTab} />
         <SellButton activeTab={activeTab} setActiveTab={setActiveTab} />
@@ -153,7 +145,20 @@ export const SwapUI = ({ market }: { market: string }) => {
         </button>
       </div>
 
+      {/* Button to toggle OrderResponse visibility */}
       {orderResponse && (
+        <div className="mt-4 mx-4">
+          <button
+            onClick={() => setShowOrderResponse(!showOrderResponse)}
+            className="w-full bg-slate-700 text-slate-100 p-2 rounded-lg hover:bg-slate-600 transition-colors"
+          >
+            {showOrderResponse ? "Hide Executed Orders" : "Show Executed Orders"}
+          </button>
+        </div>
+      )}
+
+      {/* OrderResponse Section (Collapsible) */}
+      {orderResponse && showOrderResponse && (
         <div className="mt-4 mx-4">
           <OrderResponse
             orderId={orderResponse.orderId}
@@ -163,6 +168,7 @@ export const SwapUI = ({ market }: { market: string }) => {
         </div>
       )}
     </div>
+    </ScrollArea>
   );
 };
 
