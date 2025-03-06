@@ -1,9 +1,8 @@
 "use client";
 import { Button } from "../ui/button";
-import { useState } from "react";
 
 const Appbar = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const isMenuOpen = false;
 
   return (
     <div className="flex h-16 items-center text-white justify-between bg-black px-4 border-b border-slate-700">
