@@ -16,6 +16,10 @@ app.use("/api/v1/depth", depthRouter);
 app.use("/api/v1/klines", klineRouter);
 app.use("/api/v1/tickers", tickersRouter);
 
+app.get('/health', (req, res) => {
+    res.status(200).json({ status: 'UP', timestamp: new Date().toISOString() });
+});
+
 app.listen(3001, () => {
     console.log("Server is running on port 3001");
 });

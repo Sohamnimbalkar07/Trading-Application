@@ -4,9 +4,12 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc -b",
-    "start": "node --env-file=.env dist/index.js",
-    "seed:db": "node --env-file=.env dist/seed-db.js",
-    "refresh:views": "node --env-file=.env dist/cron.js",
+    "dev": "node --env-file=.env dist/index.js",
+    "start": "node dist/index.js",
+    "seed:db": "node dist/seed-db.js",
+    "dev:seed:db": "node --env-file=.env dist/seed-db.js",
+    "refresh:views": "node dist/cron.js",
+    "dev:refresh:views": "node --env-file=.env dist/cron.js",
     "lint": "eslint .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
