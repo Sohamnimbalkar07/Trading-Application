@@ -1,0 +1,169 @@
+version: "1.1"
+
+networks:
+  app_network:
+
+volumes:
+  db_data:
+
+services:
+  redis:
+    image: redis:latest
+    container_name: redis
+    env_file: .env
+    ports:
+      - "6379:6379"
+    networks:
+      - app_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  db:
+    image: timescale/timescaledb:latest-pg15
+    container_name: db
+    env_file: .env
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-exchange}
+      - POSTGRES_USER=${POSTGRES_USER:-admin}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-welcome}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - app_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  api:
+    build: ../api
+    container_name: api
+    env_file: .env
+    ports:
+      - "3001:3001"
+    depends_on:
+      redis:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+    environment:
+      - DATABASE_USER=${DATABASE_USER:-admin}
+      - DATABASE_HOST=${DATABASE_HOST:-db}
+      - DATABASE_NAME=${DATABASE_NAME:-exchange}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD:-welcome}
+      - DATABASE_PORT=${DATABASE_PORT:-5432}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+    networks:
+      - app_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  engine:
+    build: ../engine
+    container_name: engine
+    env_file: .env
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      - WITH_SNAPSHOT=${WITH_SNAPSHOT:-true}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+      - DATABASE_USER=${DATABASE_USER:-admin}
+      - DATABASE_HOST=${DATABASE_HOST:-db}
+      - DATABASE_NAME=${DATABASE_NAME:-exchange}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD:-welcome}
+      - DATABASE_PORT=${DATABASE_PORT:-5432}
+    networks:
+      - app_network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  db_processor:
+    build: ../db
+    container_name: db_processor
+    env_file: .env
+    depends_on:
+      redis:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+    environment:
+      - DATABASE_USER=${DATABASE_USER:-admin}
+      - DATABASE_HOST=${DATABASE_HOST:-db}
+      - DATABASE_NAME=${DATABASE_NAME:-exchange}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD:-welcome}
+      - DATABASE_PORT=${DATABASE_PORT:-5432}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+    networks:
+      - app_network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+  
+  ws:
+    build: ../ws
+    container_name: ws
+    env_file: .env
+    ports:
+      - "3002:3002"
+    depends_on:
+      redis:
+        condition: service_healthy
+      engine:
+        condition: service_healthy
+    environment:
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+    networks:
+      - app_network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  mm:
+    build: ../mm
+    container_name: mm
+    env_file: .env
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      - BACKEND_URL=${BACKEND_URL:-http://api:3001}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+    networks:
+      - app_network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

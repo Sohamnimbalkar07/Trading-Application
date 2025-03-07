@@ -37,45 +37,112 @@ export const Marketbar = ({ market }: { market: string }) => {
   }, [market]);
 
   return (
-    <div className="h-16 px-4 bg-black flex items-center gap-10 border-b border-slate-700">
-      <Ticker  />
-      <div className="flex flex-col text-white items-center">
-        <div className="font-normal">Rs. {ticker.lastPrice.toFixed(2)}</div>
-        { ticker && <div
-          className={`font-semibold ${
-            ticker.priceChangePercent >= 0 ? "text-green-500" : "text-red-500"
-          }`}
-        >
-          Rs. {ticker.priceChange.toFixed(2)}
+    <div className="h-auto md:h-16 px-4 bg-black border-b border-slate-700 py-2">
+      <div className="grid grid-cols-1 md:hidden">
+        <div className="flex justify-center items-center mb-4">
+          <Ticker />
         </div>
-}
-      </div>
-      <div className="flex flex-col  items-center">
-        <div className="font-normal text-zinc-400">24H Change</div>
-        <div
-          className={`font-semibold ${
-            ticker.priceChangePercent >= 0 ? "text-green-500" : "text-red-500"
-          }`}
-        >
-          {ticker.priceChangePercent.toFixed(2)} %
+
+        <div className="grid grid-cols-3 gap-4 mb-4">
+          <div className="flex flex-col items-center">
+            <div className="text-zinc-400 font-normal">Price</div>
+            <div className="text-white font-semibold">
+              Rs. {ticker.lastPrice.toFixed(2)}
+            </div>
+            {ticker && (
+              <div
+                className={`font-semibold ${
+                  ticker.priceChangePercent >= 0
+                    ? "text-green-500"
+                    : "text-red-500"
+                }`}
+              >
+                Rs. {ticker.priceChange.toFixed(2)}
+              </div>
+            )}
+          </div>
+
+          <div className="flex flex-col items-center">
+            <div className="text-zinc-400 font-normal">24H Change</div>
+            <div
+              className={`font-semibold ${
+                ticker.priceChangePercent >= 0
+                  ? "text-green-500"
+                  : "text-red-500"
+              }`}
+            >
+              {ticker.priceChangePercent.toFixed(2)} %
+            </div>
+          </div>
+
+          <div className="flex flex-col items-center">
+            <div className="text-zinc-400 font-normal">24H Volume</div>
+            <div className="text-white font-semibold">
+              {ticker.volume.toFixed(2)}
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col items-center">
+            <div className="text-zinc-400 font-normal">24H High</div>
+            <div className="text-white font-semibold">
+              Rs. {ticker.high.toFixed(2)}
+            </div>
+          </div>
+
+          <div className="flex flex-col items-center">
+            <div className="text-zinc-400 font-normal">24H Low</div>
+            <div className="text-white font-semibold">
+              Rs. {ticker.low.toFixed(2)}
+            </div>
+          </div>
         </div>
       </div>
-      <div className="flex flex-col items-center">
-        <div className=" text-zinc-400 font-normal">24H High</div>
-        <div className="text-white font-semibold">
-          Rs. {ticker.high.toFixed(2)}
+
+      <div className="hidden md:flex items-center gap-10">
+        <Ticker />
+        <div className="flex flex-col text-white items-center">
+          <div className="font-normal">Rs. {ticker.lastPrice.toFixed(2)}</div>
+          {ticker && (
+            <div
+              className={`font-semibold ${
+                ticker.priceChangePercent >= 0
+                  ? "text-green-500"
+                  : "text-red-500"
+              }`}
+            >
+              Rs. {ticker.priceChange.toFixed(2)}
+            </div>
+          )}
         </div>
-      </div>
-      <div className="flex flex-col items-center">
-        <div className="text-zinc-400 font-normal">24H Low</div>
-        <div className="text-white font-semibold">
-          Rs. {ticker.low.toFixed(2)}
+        <div className="flex flex-col items-center">
+          <div className="font-normal text-zinc-400">24H Change</div>
+          <div
+            className={`font-semibold ${
+              ticker.priceChangePercent >= 0 ? "text-green-500" : "text-red-500"
+            }`}
+          >
+            {ticker.priceChangePercent.toFixed(2)} %
+          </div>
         </div>
-      </div>
-      <div className="flex flex-col items-center">
-        <div className="text-zinc-400 font-normal">24H Volume</div>
-        <div className="text-white font-semibold">
-          {ticker.volume.toFixed(2)}
+        <div className="flex flex-col items-center">
+          <div className="text-zinc-400 font-normal">24H High</div>
+          <div className="text-white font-semibold">
+            Rs. {ticker.high.toFixed(2)}
+          </div>
+        </div>
+        <div className="flex flex-col items-center">
+          <div className="text-zinc-400 font-normal">24H Low</div>
+          <div className="text-white font-semibold">
+            Rs. {ticker.low.toFixed(2)}
+          </div>
+        </div>
+        <div className="flex flex-col items-center">
+          <div className="text-zinc-400 font-normal">24H Volume</div>
+          <div className="text-white font-semibold">
+            {ticker.volume.toFixed(2)}
+          </div>
         </div>
       </div>
     </div>
@@ -86,7 +153,7 @@ function Ticker() {
   return (
     <div>
       <div className="flex relative">
-        <img className="ml-4 h-14 w-14" src="/tata.png"></img>
+        <img className="h-14 w-14" src="/tata.png"></img>
       </div>
     </div>
   );

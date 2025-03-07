@@ -35,3 +35,18 @@ export interface Ticker {
   priceChange: number;
   priceChangePercent: number;
 }
+
+export interface Fill {
+  price: string;
+  qty: number;
+  tradeId: number;
+  otherUserId: string;
+  markerOrderId: string;
+  isBuyerMaker: boolean;
+}
+
+export interface OrderResponseData {
+  orderId: string;
+  executedQty: number;
+  fills: Fill[]
+}

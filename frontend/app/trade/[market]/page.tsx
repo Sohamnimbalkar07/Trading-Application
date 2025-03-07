@@ -15,19 +15,19 @@ export default function Page() {
   
   return (
     <div className="bg-black">
-      <div className="grid grid-cols-12">
-        <div className="col-span-9">
+      <div className="flex flex-col md:grid md:grid-cols-12">
+        <div className="md:col-span-9">
           <Marketbar market={market as string} />
-          <div className="grid grid-cols-12">
-            <div className="col-span-8">
-            <TradeView/>
+          <div className="flex flex-col md:grid md:grid-cols-12">
+            <div className="md:col-span-8">
+              <TradeView/>
             </div>
-            <div className="col-span-4">
+            <div className="md:col-span-4">
               <Depth/>
             </div>
           </div> 
         </div>
-        <div className="col-span-3 h-full">
+        <div className="md:col-span-3 h-full">
           <SwapUI market={market as string} />
         </div>
       </div>
