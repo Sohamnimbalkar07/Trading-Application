@@ -172,16 +172,3 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-
-  frontend:
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
-      target: production
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=${NODE_ENV}
-      - NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL}
-      - NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL}
-    command: npm start
