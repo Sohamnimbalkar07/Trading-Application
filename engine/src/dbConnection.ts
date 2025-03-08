@@ -9,8 +9,8 @@ export const pool = new Pool({
 });
 
 export async function getTickerData(market: string): Promise<any> {
-
-  const query = `select
+  try {
+    const query = `select
         min(time) as startTime,
         first(price, time) as firstPrice,
         max(price) as high,
@@ -20,24 +20,40 @@ export async function getTickerData(market: string): Promise<any> {
       from tata_prices
       where time >= now() - interval '24 hours';`;
 
-  const result = await pool.query(query);
-  const tickerData = result.rows[0];
+    const result = await pool.query(query);
 
-  const firstPrice = parseFloat(tickerData.firstprice);
-  const lastPrice = parseFloat(tickerData.lastprice);
-  const priceChange = lastPrice - firstPrice;
-  const priceChangePercent = (priceChange / firstPrice) * 100;
+    if (result.rows.length === 0) {
+      return {
+        success: false,
+        error: "No data found for the specified market",
+      };
+    }
 
-  const response = {
-    startTime: tickerData.starttime.toISOString(),
-    firstPrice: tickerData.firstprice,
-    high: tickerData.high,
-    low: tickerData.low,
-    lastPrice: tickerData.lastprice,
-    volume: tickerData.volume,
-    priceChange: priceChange.toFixed(2),
-    priceChangePercent: priceChangePercent.toFixed(2),
-  };
+    const tickerData = result.rows[0];
+    const firstPrice = parseFloat(tickerData.firstprice) || 0;
+    const lastPrice = parseFloat(tickerData.lastprice) || 0;
+    const priceChange = lastPrice - firstPrice;
+    const priceChangePercent =
+      firstPrice !== 0 ? (priceChange / firstPrice) * 100 : 0;
 
-  return response;
+    const response = {
+      startTime: tickerData.starttime
+        ? tickerData.starttime.toISOString()
+        : null,
+      firstPrice: tickerData.firstprice || "0",
+      high: tickerData.high || "0",
+      low: tickerData.low || "0",
+      lastPrice: tickerData.lastprice || "0",
+      volume: tickerData.volume || "0",
+      priceChange: priceChange.toFixed(2),
+      priceChangePercent: priceChangePercent.toFixed(2),
+    };
+
+    return { response, success: true };
+  } catch (error) {
+    return {
+      success : false,
+      error: "Failed to fetch ticker data",
+    };
+  }
 }

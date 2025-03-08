@@ -311,8 +311,22 @@ export class Orderbook {
     const currentPrice = this.currentPrice;
     const exists = await RedisManager.getInstance().keyExists(key);
     if (!exists) {
-      const ticker = await getTickerData(this.baseAsset);
-      await RedisManager.getInstance().addhSetData(key, ticker);
+      const tickerResult = await getTickerData(this.baseAsset);
+      if(tickerResult.success) {
+      await RedisManager.getInstance().addhSetData(key, tickerResult.response);
+      } else {
+        const response = {
+          startTime: Date.now().toString(),
+          firstPrice: "0",
+          high: "0",
+          low: "0",
+          lastPrice: "0",
+          volume: "0",
+          priceChange: "0",
+          priceChangePercent: "0",
+        };
+        await RedisManager.getInstance().addhSetData(key, response);
+      }
     } else {
       const tickerData = await RedisManager.getInstance().getAllhSetData(key);
       if (Number(tickerData.high) < currentPrice) {
