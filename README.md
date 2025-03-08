@@ -58,7 +58,7 @@ The system follows a **microservices architecture** with the following key compo
    - Ensures **data integrity** and provides **analytical capabilities**.
 
 
-![Platform Diagram](./backendArchitecture.png)
+![Platform Diagram](./frontend/public/backendArchitecture.png)
 
 ---
 
