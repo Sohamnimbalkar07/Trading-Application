@@ -9,6 +9,7 @@ import axios from "axios";
 import { OrderResponse } from "./OrderResponse";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { orderResponseState } from "@/store/swap/swapState";
+import ProcessingSpinner from "../ui/spinner";
 
 export const SwapUI = ({ market }: { market: string }) => {
   const [activeTab, setActiveTab] = useState("buy");
@@ -16,17 +17,19 @@ export const SwapUI = ({ market }: { market: string }) => {
   const [order, setOrder] = useRecoilState(orderState);
   const { toast } = useToast();
   const [orderResponse, setOrderResponse] = useRecoilState(orderResponseState);
-
+  const [loading, setLoading] = useState<boolean>(false);
   const [showOrderResponse, setShowOrderResponse] = useState(false);
 
   const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
 
   const handleSubmit = async () => {
+    setLoading(true);
     if (order.price < 1000 || order.price > 1050) {
       toast({
         variant: "destructive",
         description: "Price must be between 1000 and 1050.",
       });
+      setLoading(false);
       return;
     }
 
@@ -35,6 +38,7 @@ export const SwapUI = ({ market }: { market: string }) => {
         variant: "destructive",
         description: "Quantity must be between 2 and 5.",
       });
+      setLoading(false);
       return;
     }
     const newOrder = {
@@ -51,17 +55,10 @@ export const SwapUI = ({ market }: { market: string }) => {
         },
       });
 
-      setOrder({
-        price: 0,
-        quantity: 0,
-        side: "",
-        userId: "5",
-        market: "TATA_INR",
-      });
-
       if (response.data?.orderId) {
         setOrderResponse(response.data);
         setShowOrderResponse(true);
+        setLoading(false);
         toast({
           variant: "success",
           description: "Order Placed Successfully!",
@@ -69,6 +66,7 @@ export const SwapUI = ({ market }: { market: string }) => {
       }
     } catch (error) {
       console.error("Error placing order:", error);
+      setLoading(false);
       toast({
         variant: "destructive",
         description: "Failed to Place Order.",
@@ -160,9 +158,13 @@ export const SwapUI = ({ market }: { market: string }) => {
             onClick={handleSubmit}
             className={`h-14 w-full rounded-lg p-2 text-white-200 font-semibold text-xl ${
               activeTab === "buy" ? "bg-green-600" : "bg-red-500"
-            }`}
+            } flex items-center justify-center`}
           >
-            {activeTab === "buy" ? "Buy" : "Sell"}
+            {loading ? (
+              <ProcessingSpinner />
+            ) : (
+              <span>{activeTab === "buy" ? "Buy" : "Sell"}</span>
+            )}
           </button>
         </div>
 
