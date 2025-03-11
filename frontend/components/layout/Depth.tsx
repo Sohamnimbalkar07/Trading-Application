@@ -1,25 +1,48 @@
 "use client";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRecoilValue, useRecoilState } from "recoil";
 import {
   bidsState,
   asksState,
-  depthState,
   marketState,
   midPriceState,
 } from "@/store/depth/depthState";
 import { SignalingManager } from "@/utils/SignalingManager";
 import { AskTable } from "./AskTable";
 import { BidTable } from "./BidTable";
+import { getDepth } from "@/utils/httpClient";
+import { Depth as DepthType } from "@/utils/types";
 
 export const Depth = () => {
   const market = useRecoilValue(marketState);
   const [bids, setBids] = useRecoilState(bidsState);
   const [asks, setAsks] = useRecoilState(asksState);
-  const depthData = useRecoilValue(depthState);
+  const [depthData, setDepthData] = useState<DepthType>({
+    bids: [],
+    asks: [],
+    lastUpdateId: "",
+  });
   const [midPrice, setMidPrice] = useRecoilState(midPriceState);
 
   useEffect(() => {
+    setAsks(depthData.asks);
+    setBids(depthData.bids);
+}, [depthData]);
+
+  useEffect(() => {
+
+    (async () => {
+      try {
+        console.log("inside use effect depth 123");
+        const response = await getDepth(market);
+        setDepthData(response);
+        setAsks(depthData.asks);
+        setBids(depthData.bids);
+      } catch (error) {
+        console.error("Error fetching depth data:", error);
+      }
+    })();
+
     SignalingManager.getInstance().registerCallback(
       "depth",
       (data: { asks: [string, string][]; bids: [string, string][] }) => {
@@ -55,7 +78,7 @@ export const Depth = () => {
         });
 
         setAsks((originalAsks) => {
-           const asksAfterUpdate = [...(originalAsks || [])];
+          const asksAfterUpdate = [...(originalAsks || [])];
 
           for (let i = 0; i < asksAfterUpdate.length; i++) {
             for (let j = 0; j < data.asks.length; j++) {
@@ -92,9 +115,6 @@ export const Depth = () => {
       method: "SUBSCRIBE",
       params: [`depth@${market}`],
     });
-
-    setAsks(depthData.asks);
-    setBids(depthData.bids);
 
     return () => {
       SignalingManager.getInstance().sendMessage({

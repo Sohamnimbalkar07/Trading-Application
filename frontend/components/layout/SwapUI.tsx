@@ -121,7 +121,7 @@ export const SwapUI = ({ market }: { market: string }) => {
                 setOrder({ ...order, price: Number(value) });
               }
             }}
-            placeholder="Please enter a price between 1000 and 1050."
+            placeholder="Please enter a price from 1000 to 1050."
           ></input>
         </div>
         <div className="font-normal text-sm  mx-4 mt-1">

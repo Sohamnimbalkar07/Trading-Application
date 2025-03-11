@@ -1,15 +1,23 @@
 "use client";
-import { useRecoilValue, useRecoilState } from "recoil";
-import { tickerState, tickerSelector } from "@/store/ticker/tickerState";
+import { useRecoilState } from "recoil";
+import { tickerState } from "@/store/ticker/tickerState";
 import { useEffect } from "react";
 import { SignalingManager } from "@/utils/SignalingManager";
 import { Ticker as tickerType } from "@/utils/types";
+import { getTicker } from "@/utils/httpClient";
 
 export const Marketbar = ({ market }: { market: string }) => {
-  const tickerData = useRecoilValue(tickerSelector);
   const [ticker, setTicker] = useRecoilState(tickerState);
 
   useEffect(() => {
+    (async () => {
+      try {
+        const response = await getTicker(market);
+        setTicker(response);
+      } catch (error) {
+        console.error("Error fetching depth data:", error);
+      }
+    })();
     SignalingManager.getInstance().registerCallback(
       "ticker",
       (data: tickerType) => {
@@ -17,8 +25,6 @@ export const Marketbar = ({ market }: { market: string }) => {
       },
       `TICKER-${market}`
     );
-
-    setTicker(tickerData);
 
     SignalingManager.getInstance().sendMessage({
       method: "SUBSCRIBE",
