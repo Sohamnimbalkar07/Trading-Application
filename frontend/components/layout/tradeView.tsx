@@ -2,22 +2,21 @@
 import { useEffect, useRef } from "react";
 import { ChartManager } from "@/utils/ChartManager";
 import { KLine } from "@/utils/types";
-import { klineState } from "@/store/klines/klinesState";
 import { marketState } from "@/store/depth/depthState";
 import { useRecoilValue } from "recoil";
 import { SignalingManager } from "@/utils/SignalingManager";
+import { getKlines } from "@/utils/httpClient";
 
 export function TradeView() {
   const chartRef = useRef<HTMLDivElement>(null);
   const chartManagerRef = useRef<ChartManager>(null as any);
-  const klines = useRecoilValue(klineState);
   const market = useRecoilValue(marketState);
 
   useEffect(() => {
     const init = async () => {
       let klineData: KLine[] = [];
       try {
-        klineData = klines;
+        klineData = await getKlines(market, "1h" );
       } catch (e) {
         console.error(e)
       }

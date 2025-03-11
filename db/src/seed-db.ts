@@ -15,6 +15,9 @@ async function initializeDB() {
         );
 
         select create_hypertable('tata_prices', 'time', 'price', 2);
+
+        create index idx_tata_prices_time on tata_prices (time);
+        create index idx_tata_prices_time_price on tata_prices (time, price);
     `);
 
   await client.query(`
@@ -28,6 +31,13 @@ async function initializeDB() {
             sum(volume) as volume
         from tata_prices
         group by bucket;
+
+        create index idx_klines_1m_bucket ON klines_1m (bucket);
+        create index idx_klines_1m_open ON klines_1m (open);
+        create index idx_klines_1m_high ON klines_1m (high);
+        create index idx_klines_1m_low ON klines_1m (low);
+        create index idx_klines_1m_close ON klines_1m (close);
+        create index idx_klines_1m_volume ON klines_1m (volume);
     `);
 
     // first(price, time) -> first(value_column, sort_column)
@@ -42,6 +52,14 @@ async function initializeDB() {
             sum(volume) as volume
         from tata_prices
         group by bucket;
+
+        create index idx_klines_1h_bucket ON klines_1h (bucket);
+        create index idx_klines_1h_open ON klines_1h (open);
+        create index idx_klines_1h_high ON klines_1h (high);
+        create index idx_klines_1h_low ON klines_1h (low);
+        create index idx_klines_1h_close ON klines_1h (close);
+        create index idx_klines_1h_volume ON klines_1h (volume);
+
     `);
 
   await client.query(`
@@ -55,6 +73,13 @@ async function initializeDB() {
             sum(volume) as volume
         from tata_prices
         group by bucket;
+
+        create index idx_klines_1w_bucket ON klines_1w (bucket);
+        create index idx_klines_1w_open ON klines_1w (open);
+        create index idx_klines_1w_high ON klines_1w (high);
+        create index idx_klines_1w_low ON klines_1w (low);
+        create index idx_klines_1w_close ON klines_1w (close);
+        create index idx_klines_1w_volume ON klines_1w (volume);
     `);
 
   client.release();

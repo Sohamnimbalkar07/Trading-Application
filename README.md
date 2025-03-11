@@ -13,6 +13,8 @@ This project is a scalable, low-latency order matching system designed to handle
 - **Frontend**: Next.js  
 - **Communication**: WebSocket  
 
+---
+
 ## 🏗 Architecture
 
 The system follows a **microservices architecture** with the following key components:
@@ -60,6 +62,29 @@ The system follows a **microservices architecture** with the following key compo
 
 ![Platform Diagram](./frontend/public/backendArchitecture.png)
 
+---
+
+# Cloud Infrastructure Deployment
+
+This project deploys a **containerized backend server** on an **AWS EC2 instance**, using **Docker** for application management, **NGINX** as a reverse proxy, and **Certbot** for automated SSL certificate provisioning. The domain, purchased from **GoDaddy**, is configured to route traffic to the EC2 instance, ensuring a **secure** and **scalable** deployment.
+
+## Key Features
+
+- **Containerized Backend**: The backend server is deployed using **Docker**, ensuring consistency and ease of management.
+- **Reverse Proxy with NGINX**: **NGINX** handles incoming traffic, routing requests to the backend server.
+- **SSL Encryption**: **Certbot** automatically provisions and renews SSL certificates from **Let's Encrypt**, enabling secure **HTTPS** connections.
+- **Domain Configuration**: The **GoDaddy** domain is linked to the EC2 instance via **DNS A record** updates, ensuring seamless accessibility.
+
+## Deployment Workflow
+
+1. **Domain Setup**: Configure the **GoDaddy DNS** settings to point to the **EC2 instance's** **public IP address**.
+2. **Docker Deployment**: Build and run the backend server inside a **Docker container** on the **EC2 instance**.
+3. **NGINX Configuration**: Set up **NGINX** as a reverse proxy to forward traffic from the domain to the backend server.
+4. **SSL Setup**: Use **Certbot** to obtain and install **SSL certificates**, enabling **HTTPS** for secure communication.
+5. **Verification**: Test the deployment to ensure the backend server is **accessible**, **secure**, and functioning as expected.
+
+This deployment provides a **robust**, **secure**, and **efficient** solution for hosting backend services.
+  
 ---
 
 ## 📡 WebSocket Subscription
