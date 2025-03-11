@@ -177,6 +177,18 @@ Create a new order in the specified market.
 
 ```json
 {
+    "market": "TATA_INR",
+    "side": "buy",
+    "price": 1000.97,
+    "quantity": 2.5,
+    userId: "5"
+}
+```
+
+#### Response Body:
+
+```json
+{
   "orderId": "6rq4ll66wte2yex35p64ge",
   "executedQty": 6.04,
   "fills": [
@@ -189,19 +201,6 @@ Create a new order in the specified market.
       "isBuyerMaker": true
     }
   ]
-}
-```
-
-#### Response Body:
-
-```json
-{
-    "orderId": "g5xehpcjuqbhdsqvp37h7",
-    "market": "TATA_INR",
-    "side": "buy",
-    "price": 1000.97,
-    "quantity": 2.5,
-    "status": "open"
 }
 ```
 
@@ -226,7 +225,7 @@ Cancel an existing order.
 
 ```json
 {
-    "orderId": "974htbuumoch1xmhwywlfu",
+    "orderId": "g5xehpcjuqbhdsqvp37h7",
     "executedQty": 7,
     "remainingQty": 2
 }
