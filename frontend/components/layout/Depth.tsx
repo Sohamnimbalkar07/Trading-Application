@@ -12,6 +12,7 @@ import { AskTable } from "./AskTable";
 import { BidTable } from "./BidTable";
 import { getDepth } from "@/utils/httpClient";
 import { Depth as DepthType } from "@/utils/types";
+import ProcessingSpinner from "@/components/ui/spinner";
 
 export const Depth = () => {
   const market = useRecoilValue(marketState);
@@ -23,23 +24,25 @@ export const Depth = () => {
     lastUpdateId: "",
   });
   const [midPrice, setMidPrice] = useRecoilState(midPriceState);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     setAsks(depthData.asks);
     setBids(depthData.bids);
-}, [depthData]);
+  }, [depthData]);
 
   useEffect(() => {
-
     (async () => {
       try {
-        console.log("inside use effect depth 123");
+        setIsLoading(true);
         const response = await getDepth(market);
         setDepthData(response);
         setAsks(depthData.asks);
         setBids(depthData.bids);
       } catch (error) {
         console.error("Error fetching depth data:", error);
+      } finally {
+        setIsLoading(false);
       }
     })();
 
@@ -145,15 +148,27 @@ export const Depth = () => {
   }, [midPriceValue]);
 
   return (
-    <div className="border-l-2 bg-slate-950 border-slate-700">
-      <div className="flex gap-7 h-6 p-1 px-2 bg-black">
-        <div className="text-slate-100 font-normal cursor-pointer">Depth</div>
-        <div className="text-slate-100 font-normal cursor-pointer">Trade</div>
-      </div>
-      <TableHeader />
-      <AskTable />
-      <div className="text-slate-50 px-3">{midPrice.toFixed(2)}</div>
-      <BidTable />
+    <div className="border-l-2 bg-slate-950 border-slate-700 h-full">
+      {isLoading ? (
+        <div className="h-full flex justify-center items-center">
+          <ProcessingSpinner size={10} radius={10} color="white" />
+        </div>
+      ) : (
+        <div>
+          <div className="flex gap-7 h-6 p-1 px-2 bg-black">
+            <div className="text-slate-100 font-normal cursor-pointer">
+              Depth
+            </div>
+            <div className="text-slate-100 font-normal cursor-pointer">
+              Trade
+            </div>
+          </div>
+          <TableHeader />
+          <AskTable />
+          <div className="text-slate-50 px-3">{midPrice.toFixed(2)}</div>
+          <BidTable />
+        </div>
+      )}
     </div>
   );
 };

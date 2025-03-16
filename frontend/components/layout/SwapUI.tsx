@@ -161,7 +161,7 @@ export const SwapUI = ({ market }: { market: string }) => {
             } flex items-center justify-center`}
           >
             {loading ? (
-              <ProcessingSpinner />
+              <ProcessingSpinner size={5} radius={10} text="Processing..." />
             ) : (
               <span>{activeTab === "buy" ? "Buy" : "Sell"}</span>
             )}
