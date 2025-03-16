@@ -67,7 +67,14 @@ export class SignalingManager {
             const high = message.high;
             const low = message.low;
             const volume = message.volume;
-            callback({end, open, close, high, low, volume});
+            callback({ end, open, close, high, low, volume });
+          }
+          if (type === "fills") {
+            const orderId = message.orderId;
+            const quantity = message.quantity;
+            const tradeId = message.tradeId;
+            const price = message.price;
+            callback({ orderId, quantity, tradeId, price });
           }
         });
       }

@@ -64,9 +64,9 @@ export class Orderbook {
     if (order.side === "buy") {
       const { executedQty, fills } = this.matchBid(order);
       order.filled = executedQty;
-      if(fills.length !== 0) {
-      this.currentPrice = Number(fills[fills.length - 1].price);
-      this.updateTicker(executedQty);
+      if (fills.length !== 0) {
+        this.currentPrice = Number(fills[fills.length - 1].price);
+        this.updateTicker(executedQty);
       }
       if (executedQty === order.quantity) {
         return {
@@ -83,9 +83,9 @@ export class Orderbook {
     } else {
       const { executedQty, fills } = this.matchAsk(order);
       order.filled = executedQty;
-      if(fills.length !== 0) {
-      this.currentPrice = Number(fills[fills.length - 1].price);
-      this.updateTicker(executedQty);
+      if (fills.length !== 0) {
+        this.currentPrice = Number(fills[fills.length - 1].price);
+        this.updateTicker(executedQty);
       }
       if (executedQty === order.quantity) {
         return {
@@ -122,6 +122,21 @@ export class Orderbook {
           markerOrderId: this.asks[i].orderId,
           isBuyerMaker: false,
         });
+
+        RedisManager.getInstance().publishMessage(
+          `fills@${this.baseAsset}_${this.quoteAsset}`,
+          {
+            stream: `fills@${this.baseAsset}_${this.quoteAsset}`,
+            data: {
+              e: "fills",
+              orderId: this.asks[i].orderId,
+              price: this.asks[i].price.toString(),
+              quantity: filledQty,
+              tradeId: this.lastTradeId,
+              userId: this.asks[i].userId,
+            },
+          }
+        );
 
         this.updateKline(
           this.baseAsset,
@@ -164,6 +179,21 @@ export class Orderbook {
           markerOrderId: this.bids[i].orderId,
           isBuyerMaker: true,
         });
+
+        RedisManager.getInstance().publishMessage(
+          `fills@${this.baseAsset}_${this.quoteAsset}`,
+          {
+            stream: `fills@${this.baseAsset}_${this.quoteAsset}`,
+            data: {
+              e: "fills",
+              orderId: this.bids[i].orderId,
+              price: this.bids[i].price.toString(),
+              quantity: amountRemaining,
+              tradeId: this.lastTradeId,
+              userId: this.bids[i].userId,
+            },
+          }
+        );
 
         this.updateKline(
           this.ticker(),
@@ -312,8 +342,11 @@ export class Orderbook {
     const exists = await RedisManager.getInstance().keyExists(key);
     if (!exists) {
       const tickerResult = await getTickerData(this.baseAsset);
-      if(tickerResult.success) {
-      await RedisManager.getInstance().addhSetData(key, tickerResult.response);
+      if (tickerResult.success) {
+        await RedisManager.getInstance().addhSetData(
+          key,
+          tickerResult.response
+        );
       } else {
         const response = {
           startTime: Date.now().toString(),

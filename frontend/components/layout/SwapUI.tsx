@@ -10,6 +10,7 @@ import { OrderResponse } from "./OrderResponse";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { orderResponseState } from "@/store/swap/swapState";
 import ProcessingSpinner from "../ui/spinner";
+import { SignalingManager } from "@/utils/SignalingManager";
 
 export const SwapUI = ({ market }: { market: string }) => {
   const [activeTab, setActiveTab] = useState("buy");
@@ -23,7 +24,13 @@ export const SwapUI = ({ market }: { market: string }) => {
   const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
 
   const handleSubmit = async () => {
+    SignalingManager.getInstance().sendMessage({
+      method: "UNSUBSCRIBE",
+      params: [`fills@${market}`],
+    });
+
     setLoading(true);
+    setOrderResponse(null);
     if (order.price < 1000 || order.price > 1050) {
       toast({
         variant: "destructive",
@@ -48,6 +55,12 @@ export const SwapUI = ({ market }: { market: string }) => {
       side: activeTab,
       userId: "5",
     };
+
+    SignalingManager.getInstance().sendMessage({
+      method: "SUBSCRIBE",
+      params: [`fills@${market}`],
+    });
+
     try {
       const response = await axios.post(`${BASE_URL}/order`, newOrder, {
         headers: {
@@ -64,6 +77,51 @@ export const SwapUI = ({ market }: { market: string }) => {
           description: "Order Placed Successfully!",
         });
       }
+
+      SignalingManager.getInstance().registerCallback(
+        "fills",
+        (data: {
+          orderId: string;
+          tradeId: number;
+          quantity: number;
+          price: number;
+        }) => {
+          console.log(
+            "data.orderId",
+            data.orderId,
+            "orderResponse?.orderId",
+            orderResponse?.orderId
+          );
+          console.log(data.orderId === orderResponse?.orderId);
+          if (data.orderId === response.data?.orderId) {
+            console.log("inside fills callback");
+            console.log(data.orderId);
+            setOrderResponse(
+              (prevOrderResponse: typeof orderResponse | null) => {
+                if (!prevOrderResponse) return null;
+
+                return {
+                  ...prevOrderResponse,
+                  executedQty: prevOrderResponse.executedQty + data.quantity,
+                  fills: [
+                    {
+                      tradeId: data.tradeId,
+                      qty: data.quantity,
+                      price: data.price.toString(),
+                    },
+                    ...prevOrderResponse.fills,
+                  ],
+                };
+              }
+            );
+            toast({
+              variant: "success",
+              description: "Fills Are Updated!",
+            });
+          }
+        },
+        `fills-${market}`
+      );
     } catch (error) {
       console.error("Error placing order:", error);
       setLoading(false);
