@@ -193,11 +193,11 @@ Create a new order in the specified market.
 ```json
 {
     "market": "TATA_INR",
-    "side": "buy" | "sell",
+    "side": "buy" \| "sell",
     "price": 1000.97,
     "quantity": 2.5,
     "userId": "5"
-    orderType: "long-term" | "intraday"
+    orderType: "long-term" \| "intraday"
 }
 ```
 
