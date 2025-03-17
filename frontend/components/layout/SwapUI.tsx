@@ -19,6 +19,7 @@ export const SwapUI = ({ market }: { market: string }) => {
   const [order, setOrder] = useRecoilState(orderState);
   const { toast } = useToast();
   const [orderResponse, setOrderResponse] = useRecoilState(orderResponseState);
+  const [partialExecutionMessage, setPartialExecutionMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [showOrderResponse, setShowOrderResponse] = useState(false);
   const [orderType, setOrderType] = useState("intraday");
@@ -73,6 +74,13 @@ export const SwapUI = ({ market }: { market: string }) => {
       if (response.data?.orderId) {
         setOrderResponse(response.data);
         setShowOrderResponse(true);
+        if (response.data?.executedQty < order.quantity) {
+          setPartialExecutionMessage(
+            "Your order is partially executed. We'll update you once it's fully completed."
+          );
+        } else {
+          setPartialExecutionMessage(null);
+        };
         setLoading(false);
         await SignalingManager.getInstance().registerCallback(
           "fills",
@@ -245,6 +253,7 @@ export const SwapUI = ({ market }: { market: string }) => {
               orderId={orderResponse.orderId}
               executedQty={orderResponse.executedQty}
               fills={orderResponse.fills}
+              message={partialExecutionMessage}
             />
           </div>
         )}

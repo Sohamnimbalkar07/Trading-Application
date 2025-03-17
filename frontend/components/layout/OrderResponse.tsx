@@ -4,10 +4,18 @@ import React from "react";
 import { IndianRupee } from "lucide-react";
 import { OrderResponseData } from "@/utils/types";
 
+interface ExtendedOrderResponseData extends OrderResponseData {
+  message?: string | null;
+}
 
-export const OrderResponse = ({ orderId, executedQty, fills }: OrderResponseData) => {
+export const OrderResponse = ({ orderId, executedQty, fills, message }: ExtendedOrderResponseData) => {
   return (
     <div className="p-4 bg-slate-800 rounded-lg text-slate-100">
+     {message && (
+        <div className="mb-4 text-slate-50 text-sm">
+          {message}
+        </div>
+      )}
       <div className="mb-4">
         <div className="text-sm text-zinc-400">Order ID</div>
         <div className="text-lg font-semibold">{orderId}</div>
