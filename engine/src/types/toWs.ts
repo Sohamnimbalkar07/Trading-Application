@@ -35,8 +35,21 @@ export type klineMessage = {
   };
 };
 
+export type fillsMessage = {
+  stream: string;
+  data: {
+    e: "fills";
+    price: string;
+    tradeId: number,
+    quantity: number,
+    orderId: string,
+    userId: string
+  };
+};
+
 export type WsMessage =
   | TickerUpdateMessage
   | DepthUpdateMessage
   | TradeAddedMessage
-  | klineMessage;
+  | klineMessage
+  | fillsMessage;

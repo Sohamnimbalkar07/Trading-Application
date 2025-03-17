@@ -49,6 +49,11 @@ export class ChartManager {
     this.chart = chart;
     this.candleSeries = chart.addCandlestickSeries();
 
+    chart.timeScale().applyOptions({
+      barSpacing: 30,
+      minBarSpacing: 10,
+    });
+
     this.candleSeries.setData(
       initialData.map((data) => ({
         ...data,

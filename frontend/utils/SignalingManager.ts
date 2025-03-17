@@ -67,14 +67,21 @@ export class SignalingManager {
             const high = message.high;
             const low = message.low;
             const volume = message.volume;
-            callback({end, open, close, high, low, volume});
+            callback({ end, open, close, high, low, volume });
+          }
+          if (type === "fills") {
+            const orderId = message.orderId;
+            const quantity = message.quantity;
+            const tradeId = message.tradeId;
+            const price = message.price;
+            callback({ orderId, quantity, tradeId, price });
           }
         });
       }
     };
   }
 
-  sendMessage(message: any) {
+  async sendMessage(message: any) {
     const messageToSend = {
       ...message,
     };
@@ -87,6 +94,11 @@ export class SignalingManager {
 
   async registerCallback(type: string, callback: Function, id: string) {
     this.callbacks[type] = this.callbacks[type] || [];
+    const existingIndex = this.callbacks[type].findIndex((cb) => cb.id === id);
+
+    if (existingIndex !== -1) {
+      this.callbacks[type].splice(existingIndex, 1);
+    }
     this.callbacks[type].push({ callback, id });
   }
 

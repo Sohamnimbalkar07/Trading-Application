@@ -7,7 +7,8 @@ export type MessageToEngine = {
         price: string,
         quantity: string,
         side: "buy" | "sell",
-        userId: string
+        userId: string,
+        orderType: "intraday" | "long-term"
     }
 } | {
     type: typeof CANCEL_ORDER,

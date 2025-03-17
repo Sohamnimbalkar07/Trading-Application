@@ -32,11 +32,7 @@ export const OrderResponse = ({ orderId, executedQty, fills }: OrderResponseData
               </div>
               <div className="flex justify-between items-center">
                 <div className="text-sm">Quantity</div>
-                <div className="font-semibold">{fill.qty.toFixed(2)}</div>
-              </div>
-              <div className="flex justify-between items-center">
-                <div className="text-sm">Trade ID</div>
-                <div className="font-semibold">{fill.tradeId}</div>
+                <div className="font-semibold">{fill.qty.toFixed(4)}</div>
               </div>
             </div>
           ))}
