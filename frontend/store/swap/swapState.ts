@@ -1,7 +1,21 @@
 import { atom } from "recoil";
 import { OrderResponseData } from "@/utils/types";
 
-export const orderState = atom({
+export enum OrderType {
+  INTRADAY = "intraday",
+  LONG_TERM = "long-term",
+}
+
+interface OrderState {
+  market: string;
+  price: number;
+  quantity: number;
+  side: string;
+  userId: string;
+  orderType: OrderType;
+}
+
+export const orderState = atom<OrderState>({
   key: "orderState",
   default: {
     market: "",
@@ -9,6 +23,7 @@ export const orderState = atom({
     quantity: 0,
     side: "",
     userId: "",
+    orderType: OrderType.INTRADAY
   },
 });
 

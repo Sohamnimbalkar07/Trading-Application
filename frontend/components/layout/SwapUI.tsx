@@ -5,6 +5,7 @@ import { IndianRupee } from "lucide-react";
 import { useRecoilState } from "recoil";
 import { orderState } from "@/store/swap/swapState";
 import { useToast } from "@/components/ui/use-toast";
+import { Checkbox } from "@/components/ui/checkbox";
 import axios from "axios";
 import { OrderResponse } from "./OrderResponse";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -20,18 +21,18 @@ export const SwapUI = ({ market }: { market: string }) => {
   const [orderResponse, setOrderResponse] = useRecoilState(orderResponseState);
   const [loading, setLoading] = useState<boolean>(false);
   const [showOrderResponse, setShowOrderResponse] = useState(false);
+  const [orderType, setOrderType] = useState("intraday");
 
   const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
 
-  const handleSubmit = async () => {
-    SignalingManager.getInstance().sendMessage({
-      method: "UNSUBSCRIBE",
-      params: [`fills@${market}`],
-    });
+  const handleOrderTypeChange = (type: string) => {
+    setOrderType(type);
+  };
 
+  const handleSubmit = async () => {
     setLoading(true);
     setOrderResponse(null);
-    if (order.price < 1000 || order.price > 1050) {
+    if (order.price < 1000 || order.price > 1010) {
       toast({
         variant: "destructive",
         description: "Price must be between 1000 and 1050.",
@@ -54,9 +55,10 @@ export const SwapUI = ({ market }: { market: string }) => {
       quantity: order.quantity,
       side: activeTab,
       userId: "5",
+      orderType,
     };
 
-    SignalingManager.getInstance().sendMessage({
+    await SignalingManager.getInstance().sendMessage({
       method: "SUBSCRIBE",
       params: [`fills@${market}`],
     });
@@ -72,56 +74,46 @@ export const SwapUI = ({ market }: { market: string }) => {
         setOrderResponse(response.data);
         setShowOrderResponse(true);
         setLoading(false);
+        await SignalingManager.getInstance().registerCallback(
+          "fills",
+          (data: {
+            orderId: string;
+            tradeId: number;
+            quantity: number;
+            price: number;
+          }) => {
+            if (data.orderId === response.data?.orderId) {
+              setOrderResponse(
+                (prevOrderResponse: typeof orderResponse | null) => {
+                  if (!prevOrderResponse) return null;
+
+                  return {
+                    ...prevOrderResponse,
+                    executedQty: prevOrderResponse.executedQty + data.quantity,
+                    fills: [
+                      {
+                        tradeId: data.tradeId,
+                        qty: data.quantity,
+                        price: data.price.toString(),
+                      },
+                      ...prevOrderResponse.fills,
+                    ],
+                  };
+                }
+              );
+              toast({
+                variant: "success",
+                description: "More shares have been added to your order!",
+              });
+            }
+          },
+          `fills-${market}`
+        );
         toast({
           variant: "success",
           description: "Order Placed Successfully!",
         });
       }
-
-      SignalingManager.getInstance().registerCallback(
-        "fills",
-        (data: {
-          orderId: string;
-          tradeId: number;
-          quantity: number;
-          price: number;
-        }) => {
-          console.log(
-            "data.orderId",
-            data.orderId,
-            "orderResponse?.orderId",
-            orderResponse?.orderId
-          );
-          console.log(data.orderId === orderResponse?.orderId);
-          if (data.orderId === response.data?.orderId) {
-            console.log("inside fills callback");
-            console.log(data.orderId);
-            setOrderResponse(
-              (prevOrderResponse: typeof orderResponse | null) => {
-                if (!prevOrderResponse) return null;
-
-                return {
-                  ...prevOrderResponse,
-                  executedQty: prevOrderResponse.executedQty + data.quantity,
-                  fills: [
-                    {
-                      tradeId: data.tradeId,
-                      qty: data.quantity,
-                      price: data.price.toString(),
-                    },
-                    ...prevOrderResponse.fills,
-                  ],
-                };
-              }
-            );
-            toast({
-              variant: "success",
-              description: "Fills Are Updated!",
-            });
-          }
-        },
-        `fills-${market}`
-      );
     } catch (error) {
       console.error("Error placing order:", error);
       setLoading(false);
@@ -179,7 +171,7 @@ export const SwapUI = ({ market }: { market: string }) => {
                 setOrder({ ...order, price: Number(value) });
               }
             }}
-            placeholder="Please enter a price from 1000 to 1050."
+            placeholder="Please enter a price from 1000 to 1010."
           ></input>
         </div>
         <div className="font-normal text-sm  mx-4 mt-1">
@@ -196,18 +188,26 @@ export const SwapUI = ({ market }: { market: string }) => {
             placeholder="Please enter a quantity between 2 and 5."
           ></input>
         </div>
-        <div className="flex justify-between items-center my-2 h-10 mx-4">
-          <div className="bg-slate-100 text-black p-1 rounded-xl h-7 text-center w-14 font-medium cursor-pointer">
-            25 %
+        <div className="flex justify-around items-center my-2 h-10 mx-4">
+          <div className="flex items-center justify-center gap-3">
+            <div>
+              <Checkbox
+                className="bg-slate-50"
+                checked={orderType === "intraday"}
+                onCheckedChange={() => handleOrderTypeChange("intraday")}
+              />
+            </div>
+            <div>Intra-Day</div>
           </div>
-          <div className="bg-slate-100 text-black p-1 rounded-xl h-7 text-center w-14 font-medium cursor-pointer">
-            50 %
-          </div>
-          <div className="bg-slate-100 text-black p-1 rounded-xl h-7 text-center w-14 font-medium cursor-pointer">
-            75 %
-          </div>
-          <div className="bg-slate-100 text-black p-1 rounded-xl h-7 text-center w-14 font-medium cursor-pointer">
-            Max
+          <div className="flex items-center justify-center gap-3">
+            <div>
+              <Checkbox
+                className="bg-slate-50"
+                checked={orderType === "long-term"}
+                onCheckedChange={() => handleOrderTypeChange("long-term")}
+              />
+            </div>
+            <div>Long-Term</div>
           </div>
         </div>
         <div className="font-normal text-sm mt-1 mx-4">

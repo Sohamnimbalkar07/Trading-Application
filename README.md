@@ -94,7 +94,7 @@ WebSockets provide real-time updates on market data such as order book depth, ca
 ```json
 {
   "method" : "SUBSCRIBE",
-  "params" : ["depth@TATA_INR", "kline@TATA_INR:1h", "ticker@TATA_INR"]
+  "params" : ["depth@TATA_INR", "kline@TATA_INR:1h", "ticker@TATA_INR", "fills@TATA_INR"]
 }
 ```
 ### Unsubscription Request Format
@@ -102,7 +102,7 @@ To stop receiving updates, you can send an unsubscribe request.
 ```json
 {
   "method" : "UNSUBSCRIBE",
-  "params" : ["depth@TATA_INR", "kline@TATA_INR:1h", "ticker@TATA_INR"]
+  "params" : ["depth@TATA_INR", "kline@TATA_INR:1h", "ticker@TATA_INR", "fills@TATA_INR"]
 }
 ```
 
@@ -163,6 +163,21 @@ Provides real-time market ticker information, including price changes, trading v
    "priceChangePercent":"-0.03"
 }
 ```
+
+#### 4. Fills Data (`fills@TATA_INR`)
+Provides real-time updates on trade executions (fills) for orders. This event is triggered whenever an order is partially or fully filled.
+
+##### Response Example:
+```json
+{
+  "e": "fills",
+  "orderId": "6rq4ll66wte2yex35p64ge",
+  "price": "1005.50",
+  "quantity": "10.25",
+  "tradeId": 36005,
+  "userId": "5"
+}
+```
 ---
 
 ## 🌐 API Endpoints
@@ -178,10 +193,11 @@ Create a new order in the specified market.
 ```json
 {
     "market": "TATA_INR",
-    "side": "buy",
+    "side": "buy" | "sell",
     "price": 1000.97,
     "quantity": 2.5,
     "userId": "5"
+    orderType: "long-term" | "intraday"
 }
 ```
 
