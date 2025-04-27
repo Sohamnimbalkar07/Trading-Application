@@ -3,7 +3,7 @@ import { processDbUpdates } from "./dbUpdates";
 
 async function main() {
   const redisClient = createClient({
-    url: process.env.REDIS_URL
+    url: process.env.REDIS_URL,
   });
   await redisClient.connect();
 
